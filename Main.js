@@ -156,7 +156,7 @@ function startRendering(gl, state) {
         then = now;
 
         let arm = getObjectByName(state, "arm");
-        mat4.rotateX(arm.model.rotation, arm.model.rotation, 0.8 * deltaTime);
+        // mat4.rotateX(arm.model.rotation, arm.model.rotation, 0.8 * deltaTime);
         // Draw our scene
         drawScene(gl, deltaTime, state);
 
