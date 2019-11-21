@@ -49,6 +49,9 @@ function main() {
             arm = getObjectByName(state, "arm");
             arm.model.position = vec3.fromValues(0.0, 0.0, 0.5);
 
+
+            setupKeypresses(state);
+
             console.log("Starting rendering loop");
             startRendering(gl, state);
         })
@@ -319,6 +322,243 @@ function drawScene(gl, deltaTime, state) {
 
     });
 }
+
+/************************************
+ * UI EVENTS
+ ************************************/
+
+function setupKeypresses(state) {
+    document.addEventListener("keydown", (event) => {
+        //console.log(event.code);
+		//console.log(state.hasSelected);
+		
+        var object = state.objects[state.selectedIndex];
+
+        switch (event.code) {
+            case "KeyA":
+                if (event.getModifierState("Shift")) {
+                    if (state.hasSelected) {
+                        // TODO Rotate selected object around Y
+                        mat4.rotateY(object.model.rotation, object.model.rotation, -0.12);
+                    } else {
+                        // TODO Rotate camera around Y
+                        vec3.rotateY(state.camera.center, state.camera.center, state.camera.position, 0.12);
+
+                    }
+                } else {
+                    if (state.hasSelected) {
+                        // TODO: Move selected object along X axis
+                        vec3.add(object.model.position, object.model.position, vec3.fromValues(0.1, 0.0, 0.0));
+                    } else {
+                        // TODO: Move camera along X axis
+                        vec3.add(state.camera.center, state.camera.center, vec3.fromValues(0.1, 0.0, 0.0));
+                        vec3.add(state.camera.position, state.camera.position, vec3.fromValues(0.1, 0.0, 0.0));
+                    }
+                }
+                break;
+            case "KeyD":
+                if (event.getModifierState("Shift")) {
+                    if (state.hasSelected) {
+                        // TODO Rotate selected object around Y (other direction)
+                        mat4.rotateY(object.model.rotation, object.model.rotation, 0.12);
+                    } else {
+                        // TODO Rotate camera around Y (other direction)
+                        vec3.rotateY(state.camera.center, state.camera.center, state.camera.position, -0.12);
+
+                    }
+                } else {
+                    if (state.hasSelected) {
+                        // TODO: Move selected object along X axis (other direction)
+                        vec3.add(object.model.position, object.model.position, vec3.fromValues(-0.1, 0.0, 0.0));
+                    } else {
+                        // TODO: Move camera along X axis (other direction)
+                        vec3.add(state.camera.center, state.camera.center, vec3.fromValues(-0.1, 0.0, 0.0));
+                        vec3.add(state.camera.position, state.camera.position, vec3.fromValues(-0.1, 0.0, 0.0));
+                    }
+                }
+                break;
+            case "KeyW":
+                if (event.getModifierState("Shift")) {
+                    if (state.hasSelected) {
+                        // TODO: rotate selection forward and backward around view X
+                        mat4.rotateX(object.model.rotation, object.model.rotation, -0.12);
+                    } else {
+                        // TODO: Rotate camera about X axis (pitch)
+                        vec3.rotateX(state.camera.center, state.camera.center, state.camera.position, 0.12);
+
+                    }
+                } else {
+                    if (state.hasSelected) {
+                        // TODO: Move selected object along Z axis
+                        vec3.add(object.model.position, object.model.position, vec3.fromValues(0.0, 0.0, 0.1));
+                    } else {
+                        // TODO: Move camera along Z axis
+                        vec3.add(state.camera.center, state.camera.center, vec3.fromValues(0.0, 0.0, 0.1));
+                        vec3.add(state.camera.position, state.camera.position, vec3.fromValues(0.0, 0.0, 0.1));
+                    }
+                }
+                break;
+            case "KeyS":
+                if (event.getModifierState("Shift")) {
+                    if (state.hasSelected) {
+                        // TODO: rotate selection forward and backward around view X (other direction)
+                        mat4.rotateX(object.model.rotation, object.model.rotation, 0.12);
+                    } else {
+                        // TODO: Rotate camera about X axis (pitch)
+                        vec3.rotateX(state.camera.center, state.camera.center, state.camera.position, -0.12);
+                    }
+                } else {
+                    if (state.hasSelected) {
+                        // TODO: Move selected object along Z axis  (other direction)
+                        vec3.add(object.model.position, object.model.position, vec3.fromValues(0.0, 0.0, -0.1));
+                    } else {
+                        // TODO: Move camera along Z axis (other direction)
+                        vec3.add(state.camera.center, state.camera.center, vec3.fromValues(0.0, 0.0, -0.1));
+                        vec3.add(state.camera.position, state.camera.position, vec3.fromValues(0.0, 0.0, -0.1));
+                        
+                    }
+                }
+                break;
+            case "KeyQ":
+                if (event.getModifierState("Shift")) {
+                    if (state.hasSelected) {
+                        // TODO : rotate selected object around z axis
+                        mat4.rotateZ(object.model.rotation, object.model.rotation, -0.12);
+                    }
+                } else {
+                    if (state.hasSelected) {
+                        // TODO : move selected object along Y axis
+                        vec3.add(object.model.position, object.model.position, vec3.fromValues(0.0, 0.1, 0.0));
+                    } else {
+                        // TODO: move camera along Y axis
+                        vec3.add(state.camera.center, state.camera.center, vec3.fromValues(0.0, 0.1, 0.0));
+                        vec3.add(state.camera.position, state.camera.position, vec3.fromValues(0.0, 0.1, 0.0));
+                    }
+                }
+
+                break;
+            case "KeyE":
+                if (event.getModifierState("Shift")) {
+                    if (state.hasSelected) {
+                        // TODO : rotate selected object around z axis
+                        mat4.rotateZ(object.model.rotation, object.model.rotation, 0.12);
+                    }
+                } else {
+                    if (state.hasSelected) {
+                        // TODO : move selected object along Y axis 
+                        vec3.add(object.model.position, object.model.position, vec3.fromValues(0.0, -0.1, 0.0));
+                    } else {
+                        // TODO: move camera along Y axis
+                        vec3.add(state.camera.center, state.camera.center, vec3.fromValues(0.0, -0.1, 0.0));
+                        vec3.add(state.camera.position, state.camera.position, vec3.fromValues(0.0, -0.1, 0.0));
+                    }
+                }
+                break;
+            case "Space":
+                // TODO: Highlight
+                if (!state.hasSelected) {
+                    state.hasSelected = true;
+                    changeSelectionText(state.objects[state.selectedIndex].name);
+                    // TODO scale object here 
+                    vec3.multiply(state.objects[state.selectedIndex].model.scale,
+                                state.objects[state.selectedIndex].model.scale,
+                                vec3.fromValues(1.2, 1.2, 1.2));
+
+
+                }
+                else {
+                    state.hasSelected = false;
+                    document.getElementById("selectionText").innerHTML = "Selection: None";
+                    // TODO scale back object here 
+
+                    vec3.multiply(state.objects[state.selectedIndex].model.scale,
+                                state.objects[state.selectedIndex].model.scale,
+                                vec3.fromValues(0.85, 0.85, 0.85));
+
+                }
+
+                break;
+            case "ArrowLeft":
+                // Decreases object selected index value
+                if (state.hasSelected) {
+                    if (state.selectedIndex > 0) {
+                        //TODO: scale the selected object and descale the previously selected object, set state.selectedIndex to new value
+                        vec3.multiply(state.objects[state.selectedIndex].model.scale,
+                        state.objects[state.selectedIndex].model.scale,
+                        vec3.fromValues(0.85, 0.85, 0.85));
+
+                        state.selectedIndex--;
+
+                        vec3.multiply(state.objects[state.selectedIndex].model.scale,
+                        state.objects[state.selectedIndex].model.scale,
+                        vec3.fromValues(1.2, 1.2, 1.2));
+                    }
+                    else if (state.selectedIndex == 0) {
+                        //TODO: scale the selected object and descale the previously selected object, set state.selectedIndex to new value
+                        vec3.multiply(state.objects[state.selectedIndex].model.scale,
+                        state.objects[state.selectedIndex].model.scale,
+                        vec3.fromValues(0.85, 0.85, 0.85));
+
+                        state.selectedIndex = state.objects.length - 1;
+
+                        vec3.multiply(state.objects[state.selectedIndex].model.scale,
+                        state.objects[state.selectedIndex].model.scale,
+                        vec3.fromValues(1.2, 1.2, 1.2));
+                    }
+                    else {
+                        //TODO: scale the selected object and descale the previously selected object, set state.selectedIndex to new value
+                        vec3.multiply(state.objects[state.selectedIndex].model.scale,
+                        state.objects[state.selectedIndex].model.scale,
+                        vec3.fromValues(0.85, 0.85, 0.85));
+
+                        state.selectedIndex--;
+
+                        vec3.multiply(state.objects[state.selectedIndex].model.scale,
+                        state.objects[state.selectedIndex].model.scale,
+                        vec3.fromValues(1.2, 1.2, 1.2));
+                    }
+                    //changes the text to the object that is selected
+                    changeSelectionText(state.objects[state.selectedIndex].name);
+                }
+                break;
+            case "ArrowRight":
+                // Increases object selected index value
+                if (state.hasSelected) {
+                    if (state.selectedIndex < state.objects.length - 1) {
+                        //TODO: scale the selected object and descale the previously selected object, set state.selectedIndex to new value
+                        vec3.multiply(state.objects[state.selectedIndex].model.scale,
+                        state.objects[state.selectedIndex].model.scale,
+                        vec3.fromValues(0.85, 0.85, 0.85));                        
+
+                        state.selectedIndex++;
+
+                        vec3.multiply(state.objects[state.selectedIndex].model.scale,
+                        state.objects[state.selectedIndex].model.scale,
+                        vec3.fromValues(1.2, 1.2, 1.2));
+                    }
+                    else {
+                        //TODO: scale the selected object and descale the previously selected object, set state.selectedIndex to new value
+                        vec3.multiply(state.objects[state.selectedIndex].model.scale,
+                        state.objects[state.selectedIndex].model.scale,
+                        vec3.fromValues(0.85, 0.85, 0.85));  
+
+                        state.selectedIndex = 0;
+
+                        vec3.multiply(state.objects[state.selectedIndex].model.scale,
+                        state.objects[state.selectedIndex].model.scale,
+                        vec3.fromValues(1.2, 1.2, 1.2));                          
+                    }
+                    changeSelectionText(state.objects[state.selectedIndex].name);
+                }
+                break;
+            default:
+                break;
+        }
+    });
+
+
+}
+
 
 /************************************
  * SHADER SETUP
