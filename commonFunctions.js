@@ -5,7 +5,7 @@ function setup() {
     var navTag = document.createElement('nav');
     navTag.classList = "navbar navbar-expand-lg navbar-dark bg-dark";
     navTag.innerHTML = `
-    <a class="navbar-brand" href="#">Assignment 6</a>
+    <a class="navbar-brand" href="#">Marinario</a>
     `;
 
     // Insert the tag into the HMTL document
@@ -91,9 +91,9 @@ function loadShader(gl, type, source) {
 }
 
 /**
- * 
- * @param {state object} state 
- * @param {string with object name} objectName 
+ *
+ * @param {state object} state
+ * @param {string with object name} objectName
  */
 function getObjectByName(state, objectName) {
     for (let i = 0; i < state.objects.length; i++) {
@@ -106,8 +106,8 @@ function getObjectByName(state, objectName) {
 }
 
 /**
- * 
- * @param {array of x,y,z vertices} vertices 
+ *
+ * @param {array of x,y,z vertices} vertices
  */
 function calculateCentroid(vertices) {
 
