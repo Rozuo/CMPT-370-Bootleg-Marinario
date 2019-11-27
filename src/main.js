@@ -1,8 +1,11 @@
 var total = 0;
 var state = {};
+// mario model from https://sketchfab.com/3d-models/rigged-mario-free-099c5106369e4e7db70876c320e9a634
+// koopa model from https://www.turbosquid.com/FullPreview/Index.cfm/ID/1301668
+// goomba model from https://www.turbosquid.com/FullPreview/Index.cfm/ID/1292471
 var stats = new Stats();
 window.onload = () => {
-    parseSceneFile("./statefiles/alienScene.json", state, main);
+    parseSceneFile("./statefiles/marioScene.json", state, main);
 }
 
 /**
@@ -310,7 +313,7 @@ function startRendering(gl, state) {
             }
 
             let apple = getObject(state, "apple");
-            let alien = getObject(state, "alien");
+            let alien = getObject(state, "marinario");
 
             apple.centroid = alien.model.position;
             mat4.rotateY(apple.model.rotation, apple.model.rotation, 0.3 * deltaTime);

@@ -20,6 +20,33 @@
             "scale": [1.0, 1.0, 1.0]
         },
         {
+            "name" : "goomba",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.001, 0.001, 0.001], "specular": [0.8, 0.8, 0.8], "n":12, "alpha":1.0},
+            "type": "mesh",
+            "model" : "./models/goomba.obj",
+            "parent" : null,
+            "position": [1.0, 0, 1.0],
+            "scale": [1.0, 1.0, 1.0]
+        },
+        {
+            "name" : "koopaBod",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.001, 0.001, 0.001], "specular": [0.8, 0.8, 0.8], "n":12, "alpha":1.0},
+            "type": "mesh",
+            "model" : "./models/koopaBod.obj",
+            "parent" : null,
+            "position": [1.0, 0, 1.0],
+            "scale": [1.0, 1.0, 1.0]
+        },
+        {
+            "name" : "koopaAppendages",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.001, 0.001, 0.001], "specular": [0.8, 0.8, 0.8], "n":12, "alpha":1.0},
+            "type": "mesh",
+            "model" : "./models/koopaAppendages.obj",
+            "parent" : null,
+            "position": [1.0, 0, 1.0],
+            "scale": [1.0, 1.0, 1.0]
+        },
+        {
             "name" : "wall0",
             "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.1, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
             "type": "cube",
