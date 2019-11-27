@@ -1,7 +1,6 @@
 var total = 0;
 var state = {};
 var stats = new Stats();
-
 window.onload = () => {
     parseSceneFile("./statefiles/alienScene.json", state, main);
 }
