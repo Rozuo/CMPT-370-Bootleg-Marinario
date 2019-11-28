@@ -197,10 +197,12 @@ function main() {
         keyboard: {},
         mouse: { sensitivity: 0.2 },
         gameStarted: false,
+
+        isFirstPerson: false,
         camera: {
             name: 'camera',
-            position: vec3.fromValues(0.5, 0.0, -2.5),
-            center: vec3.fromValues(0.5, 0.0, 0.0),
+            position: vec3.fromValues(-10.0, 4.0, 0.0),
+            center: vec3.fromValues(0.0, 4.0, 0.0),
             up: vec3.fromValues(0.0, 1.0, 0.0),
             pitch: 0,
             yaw: 0,
@@ -287,6 +289,8 @@ function startRendering(gl, state) {
 
         state.deltaTime = deltaTime;
 
+        let player = getObject(state, "marinario");
+
         //wait until the scene is completely loaded to render it
         if (state.numberOfObjectsToLoad <= state.objects.length) {
             if (!state.gameStarted) {
@@ -294,18 +298,60 @@ function startRendering(gl, state) {
                 state.gameStarted = true;
             }
 
+            //PLAYER DIRECTION
             if (state.keyboard["w"]) {
-                moveForward(state);
+                //forward, first person
+                vec3.add(player.model.position, player.model.position, vec3.fromValues(0.0, 0.0, 0.2));
             }
             if (state.keyboard["s"]) {
-                moveBackward(state);
+                //backward, first person
+                vec3.add(player.model.position, player.model.position, vec3.fromValues(0.0, 0.0, -0.2));
             }
             if (state.keyboard["a"]) {
-                moveLeft(state);
+                //forward while in "2d" view
+                vec3.add(player.model.position, player.model.position, vec3.fromValues(0.0, 0.0, -0.2));
             }
             if (state.keyboard["d"]) {
+                //backwards while in "2d" view
+                vec3.add(player.model.position, player.model.position, vec3.fromValues(0.0, 0.0, 0.2));
+            }
+            //CAMERA
+            if (state.keyboard["W"]) {
+                //camera (debug)
+                moveForward(state);
+            }
+            if (state.keyboard["S"]) {
+                //camera (debug)
+                moveBackward(state);
+            }
+            if (state.keyboard["A"]) {
+                //camera (debug)
+                moveLeft(state);
+            }
+            if (state.keyboard["D"]) {
+                //camera (debug)
                 moveRight(state);
             }
+
+            if (state.keyboard["c"]) {
+                //toggle view to first person
+                state.camera.position[0] = player.model.position[0] + 0;    //front side of player
+                state.camera.position[1] = player.model.position[1] + 1;    //top of player
+                state.camera.position[2] = player.model.position[2] + 0.5;
+
+                state.camera.center = vec3.fromValues(player.model.position[0] + 0.25, 
+                                                    player.model.position[1]+1,
+                                                    player.model.position[2]+2);
+            }
+            if (!state.keyboard["c"]) {
+                //return view to "mock 2d"
+                state.camera.position[0] = -10;     //front side of player
+                state.camera.position[1] = 5;       //top of player
+                state.camera.position[2] = player.model.position[2];
+
+                state.camera.center = vec3.fromValues(0, 5, player.model.position[2]);
+            }
+            //Mouse-camera movement 0 debug
 
             if (state.mouse['camMove']) {
                 //vec3.rotateY(state.camera.center, state.camera.center, state.camera.position, (state.camera.yaw - 0.25) * deltaTime * state.mouse.sensitivity);
@@ -313,10 +359,9 @@ function startRendering(gl, state) {
             }
 
             let apple = getObject(state, "apple");
-            let alien = getObject(state, "marinario");
 
-            apple.centroid = alien.model.position;
-            mat4.rotateY(apple.model.rotation, apple.model.rotation, 0.3 * deltaTime);
+            //apple.centroid = player.model.position;
+            //mat4.rotateY(apple.model.rotation, apple.model.rotation, 0.3 * deltaTime);
 
 
             // Draw our scene
@@ -339,7 +384,8 @@ function startRendering(gl, state) {
  * @purpose Iterate through game objects and render the objects aswell as update uniforms
  */
 function drawScene(gl, deltaTime, state) {
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+
+    gl.clearColor(0.6, 0.6, 0.99, 1.0);
     gl.enable(gl.DEPTH_TEST); // Enable depth testing
     gl.depthFunc(gl.LEQUAL); // Near things obscure far things
     gl.clearDepth(1.0); // Clear everything
@@ -383,7 +429,8 @@ function drawScene(gl, deltaTime, state) {
                 );
                 gl.uniformMatrix4fv(object.programInfo.uniformLocations.view, false, viewMatrix);
 
-               gl.uniform3fv(object.programInfo.uniformLocations.cameraPosition, state.camera.position);
+                gl.uniform3fv(object.programInfo.uniformLocations.cameraPosition, state.camera.position);
+
 
                 state.viewMatrix = viewMatrix;
 
