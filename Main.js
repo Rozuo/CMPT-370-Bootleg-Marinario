@@ -3,6 +3,21 @@
 // open browser to http://localhost:8000/html/
 
 
+
+/*
+TODO:
+Fix movement controls 
+    - applies only to player
+    - Maybe try a4 pt 1, look at the drawscene
+DrawScene: Move down unless collision
+
+
+
+
+
+*/
+
+
 main();
 
 /************************************
@@ -37,18 +52,21 @@ function main() {
 
             state = setupDrawing(gl, canvas, inputTriangles);
 
+
             //initial transforms of fingers 
-            finger0 = getObjectByName(state, "finger0");
-            finger1 = getObjectByName(state, "finger1");
-            finger0.model.position = vec3.fromValues(-0.4, -0.2, 0.0);
-            finger1.model.position = vec3.fromValues(-0.4, 0.2, 0.0);
-            mat4.rotateZ(finger0.model.rotation, finger0.model.rotation, 0.35);
-            mat4.rotateZ(finger1.model.rotation, finger1.model.rotation, -0.35);
 
             // translate arm with 0.5
             arm = getObjectByName(state, "arm");
-            arm.model.position = vec3.fromValues(0.0, 0.0, 0.5);
+            //main platform position
+            arm.model.position = vec3.fromValues(0.0, -1.0, 0.0);
 
+
+            player = getObjectByName(state, "finger0");
+            finger1 = getObjectByName(state, "finger1");
+            
+            player.model.position = vec3.fromValues(0.0, 0.0, 0.0);
+            finger1.model.position = vec3.fromValues(10.0, 4.0, 0.0);
+            
 
             setupKeypresses(state);
 
@@ -68,6 +86,7 @@ function getTextures(gl, object) {
 
         image.onload = function () {
             gl.bindTexture(gl.TEXTURE_2D, texture);
+            //Repeat?
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -90,15 +109,15 @@ function setupDrawing(gl, canvas, inputTriangles) {
     // Create a state for our scene
     var state = {
         camera: {
-            position: vec3.fromValues(0.0, 0.0, 3.0),
-            center: vec3.fromValues(0.0, 0.0, 0.0),
+            position: vec3.fromValues(0.0, 5.0, 15.0),
+            center: vec3.fromValues(0.0, 5.0, 0.0),
             up: vec3.fromValues(0.0, 1.0, 0.0),
         },
         lights: [
             {
                 position: vec3.fromValues(0.4, 0.0, 2.0),
                 colour: vec3.fromValues(1.0, 1.0, 1.0),
-                strength: 1.5,
+                strength: 7.5,
             }
         ],
         objects: [],
@@ -109,6 +128,7 @@ function setupDrawing(gl, canvas, inputTriangles) {
             radius: 3.0,
             theta: Math.PI / 2.0,
         },
+        isFirstPerson: false,
         // TODO link this to a uniform and update at rendering 
         // you can then use in the shader to test if the curent object has texture or not
         samplerExists: false 
@@ -129,6 +149,7 @@ function setupDrawing(gl, canvas, inputTriangles) {
                 modelMatrix: mat4.create(),
                 name: tri.name,
                 centroid: calculateCentroid(tri.vertices),
+                jump: 0,
                 parent: tri.parent,
                 // TODO: Add reference to texture and initialize
                 // use getTextures(gl, tri)
@@ -182,7 +203,7 @@ function drawScene(gl, deltaTime, state) {
     // This is a Red-Green-Blue-Alpha colour
     // See https://en.wikipedia.org/wiki/RGB_color_model
     // Here we use floating point values. In other places you may see byte representation (0-255).
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clearColor(0.4, 0.4, 0.9, 1.0);
 
     // Depth testing allows WebGL to figure out what order to draw our objects such that the look natural.
     // We want to draw far objects first, and then draw nearer objects on top of those to obscure them.
@@ -251,6 +272,26 @@ function drawScene(gl, deltaTime, state) {
             );
             gl.uniformMatrix4fv(object.programInfo.uniformLocations.view, false, viewMatrix);
 
+
+            //jumpu - implement collision + camera following
+            if (object.jump){
+
+                //console.log("aloe");
+                object.jump += 1;                                   //change jump value to counter gravity
+                vec3.add(player.model.position, player.model.position, vec3.fromValues(0.0, 0.2, 0.0));
+
+                if(object.jump > 25){
+                    object.jump = 0;
+                }
+            }
+
+            //gravity - currently lowers player to main platform - collision later
+            if (player.model.position[1] > 0 && player.jump === 0){
+                console.log(player.model.position[1]);
+                vec3.add(player.model.position, player.model.position, vec3.fromValues(0.0, -0.1, 0.0));
+            }
+
+
             var modelMatrix = mat4.create();
             var negCentroid = vec3.fromValues(0.0, 0.0, 0.0);
             vec3.negate(negCentroid, object.centroid);
@@ -261,11 +302,11 @@ function drawScene(gl, deltaTime, state) {
             mat4.translate(modelMatrix, modelMatrix, negCentroid);
 
             //update modelview with parent model view
-            if (object.parent) {
-                let parentObject = getObjectByName(state, object.parent);
-                mat4.mul(modelMatrix, parentObject.modelMatrix, modelMatrix);
-            }
-            object.modelMatrix = modelMatrix;
+            //if (object.parent) {
+            //    let parentObject = getObjectByName(state, object.parent);
+            //    mat4.mul(modelMatrix, parentObject.modelMatrix, modelMatrix);
+            //}
+            //object.modelMatrix = modelMatrix;
 
             var normalMatrix = mat4.create();
             mat4.invert(normalMatrix, modelMatrix);
@@ -329,226 +370,186 @@ function drawScene(gl, deltaTime, state) {
 
 function setupKeypresses(state) {
     document.addEventListener("keydown", (event) => {
-        //console.log(event.code);
-		//console.log(state.hasSelected);
-		
-        var object = state.objects[state.selectedIndex];
+
+        object = getObjectByName(state, "finger0");
 
         switch (event.code) {
             case "KeyA":
                 if (event.getModifierState("Shift")) {
                     if (state.hasSelected) {
-                        // TODO Rotate selected object around Y
+                        //Rotate selected object around Y
                         mat4.rotateY(object.model.rotation, object.model.rotation, -0.12);
                     } else {
-                        // TODO Rotate camera around Y
+                        //Rotate camera around Y
                         vec3.rotateY(state.camera.center, state.camera.center, state.camera.position, 0.12);
 
                     }
                 } else {
                     if (state.hasSelected) {
-                        // TODO: Move selected object along X axis
-                        vec3.add(object.model.position, object.model.position, vec3.fromValues(0.1, 0.0, 0.0));
+                        //Move selected object along X axis
+                        vec3.add(object.model.position, object.model.position, vec3.fromValues(-0.3, 0.0, 0.0));
+                        //Update Camera
+                        vec3.add(state.camera.center, state.camera.center, vec3.fromValues(-0.3, 0.0, 0.0));
+                        vec3.add(state.camera.position, state.camera.position, vec3.fromValues(-0.3, 0.0, 0.0));
                     } else {
-                        // TODO: Move camera along X axis
-                        vec3.add(state.camera.center, state.camera.center, vec3.fromValues(0.1, 0.0, 0.0));
-                        vec3.add(state.camera.position, state.camera.position, vec3.fromValues(0.1, 0.0, 0.0));
+                        //Move camera along X axis
+                        vec3.add(state.camera.center, state.camera.center, vec3.fromValues(-0.3, 0.0, 0.0));
+                        vec3.add(state.camera.position, state.camera.position, vec3.fromValues(-0.3, 0.0, 0.0));
                     }
                 }
                 break;
             case "KeyD":
                 if (event.getModifierState("Shift")) {
                     if (state.hasSelected) {
-                        // TODO Rotate selected object around Y (other direction)
+                        //Rotate selected object around Y (other direction)
                         mat4.rotateY(object.model.rotation, object.model.rotation, 0.12);
                     } else {
-                        // TODO Rotate camera around Y (other direction)
+                        //Rotate camera around Y (other direction)
                         vec3.rotateY(state.camera.center, state.camera.center, state.camera.position, -0.12);
 
                     }
                 } else {
                     if (state.hasSelected) {
-                        // TODO: Move selected object along X axis (other direction)
-                        vec3.add(object.model.position, object.model.position, vec3.fromValues(-0.1, 0.0, 0.0));
+                        //Move selected object along X axis (other direction)
+                        vec3.add(object.model.position, object.model.position, vec3.fromValues(0.3, 0.0, 0.0));
+                        //camera update
+                        vec3.add(state.camera.center, state.camera.center, vec3.fromValues(0.3, 0.0, 0.0));
+                        vec3.add(state.camera.position, state.camera.position, vec3.fromValues(0.3, 0.0, 0.0));
+
                     } else {
-                        // TODO: Move camera along X axis (other direction)
-                        vec3.add(state.camera.center, state.camera.center, vec3.fromValues(-0.1, 0.0, 0.0));
-                        vec3.add(state.camera.position, state.camera.position, vec3.fromValues(-0.1, 0.0, 0.0));
+                        //Move camera along X axis (other direction)
+                        vec3.add(state.camera.center, state.camera.center, vec3.fromValues(0.3, 0.0, 0.0));
+                        vec3.add(state.camera.position, state.camera.position, vec3.fromValues(0.3, 0.0, 0.0));
                     }
                 }
                 break;
             case "KeyW":
                 if (event.getModifierState("Shift")) {
                     if (state.hasSelected) {
-                        // TODO: rotate selection forward and backward around view X
-                        mat4.rotateX(object.model.rotation, object.model.rotation, -0.12);
+                        //rotate selection forward and backward around view X
+                        //mat4.rotateX(object.model.rotation, object.model.rotation, -0.12);
                     } else {
-                        // TODO: Rotate camera about X axis (pitch)
+                        //Rotate camera about X axis (pitch)
                         vec3.rotateX(state.camera.center, state.camera.center, state.camera.position, 0.12);
 
                     }
                 } else {
                     if (state.hasSelected) {
-                        // TODO: Move selected object along Z axis
-                        vec3.add(object.model.position, object.model.position, vec3.fromValues(0.0, 0.0, 0.1));
+                        //Move selected object along Z axis
+                        vec3.add(object.model.position, object.model.position, vec3.fromValues(0.3, 0.0, 0.0));
+                        //follow with camera
+                        vec3.add(state.camera.center, state.camera.center, vec3.fromValues(0.3, 0.0, 0.0));
+                        vec3.add(state.camera.position, state.camera.position, vec3.fromValues(0.3, 0.0, 0.0));
+
                     } else {
-                        // TODO: Move camera along Z axis
-                        vec3.add(state.camera.center, state.camera.center, vec3.fromValues(0.0, 0.0, 0.1));
-                        vec3.add(state.camera.position, state.camera.position, vec3.fromValues(0.0, 0.0, 0.1));
+                        //Move camera along Z axis
+                        vec3.add(state.camera.center, state.camera.center, vec3.fromValues(0.0, 0.0, -0.1));
+                        vec3.add(state.camera.position, state.camera.position, vec3.fromValues(0.0, 0.0, -0.1));
+                        
+
                     }
                 }
                 break;
             case "KeyS":
                 if (event.getModifierState("Shift")) {
                     if (state.hasSelected) {
-                        // TODO: rotate selection forward and backward around view X (other direction)
-                        mat4.rotateX(object.model.rotation, object.model.rotation, 0.12);
+                        //rotate selection forward and backward around view X (other direction)
+                        //mat4.rotateX(object.model.rotation, object.model.rotation, 0.12);
                     } else {
-                        // TODO: Rotate camera about X axis (pitch)
+                        //Rotate camera about X axis (pitch)
                         vec3.rotateX(state.camera.center, state.camera.center, state.camera.position, -0.12);
                     }
                 } else {
                     if (state.hasSelected) {
-                        // TODO: Move selected object along Z axis  (other direction)
-                        vec3.add(object.model.position, object.model.position, vec3.fromValues(0.0, 0.0, -0.1));
+                        //Move selected object foward during first person
+                        vec3.add(object.model.position, object.model.position, vec3.fromValues(-0.3, 0.0, 0.0));
+                        //follow with camera
+                        vec3.add(state.camera.center, state.camera.center, vec3.fromValues(-0.3, 0.0, 0.0));
+                        vec3.add(state.camera.position, state.camera.position, vec3.fromValues(-0.3, 0.0, 0.0));
                     } else {
-                        // TODO: Move camera along Z axis (other direction)
-                        vec3.add(state.camera.center, state.camera.center, vec3.fromValues(0.0, 0.0, -0.1));
-                        vec3.add(state.camera.position, state.camera.position, vec3.fromValues(0.0, 0.0, -0.1));
+                        //Move camera along Z axis (other direction)
+                        vec3.add(state.camera.center, state.camera.center, vec3.fromValues(0.0, 0.0, 0.1));
+                        vec3.add(state.camera.position, state.camera.position, vec3.fromValues(0.0, 0.0, 0.1));
                         
                     }
                 }
                 break;
             case "KeyQ":
-                if (event.getModifierState("Shift")) {
-                    if (state.hasSelected) {
-                        // TODO : rotate selected object around z axis
-                        mat4.rotateZ(object.model.rotation, object.model.rotation, -0.12);
-                    }
+                if (state.hasSelected) {
+                    //move selected object along Y axis
+                    //vec3.add(object.model.position, object.model.position, vec3.fromValues(0.0, 0.1, 0.0));
                 } else {
-                    if (state.hasSelected) {
-                        // TODO : move selected object along Y axis
-                        vec3.add(object.model.position, object.model.position, vec3.fromValues(0.0, 0.1, 0.0));
-                    } else {
-                        // TODO: move camera along Y axis
-                        vec3.add(state.camera.center, state.camera.center, vec3.fromValues(0.0, 0.1, 0.0));
-                        vec3.add(state.camera.position, state.camera.position, vec3.fromValues(0.0, 0.1, 0.0));
-                    }
+                    //move camera along Y axis
+                    vec3.add(state.camera.center, state.camera.center, vec3.fromValues(0.0, 0.1, 0.0));
+                    vec3.add(state.camera.position, state.camera.position, vec3.fromValues(0.0, 0.1, 0.0));
                 }
-
                 break;
             case "KeyE":
-                if (event.getModifierState("Shift")) {
-                    if (state.hasSelected) {
-                        // TODO : rotate selected object around z axis
-                        mat4.rotateZ(object.model.rotation, object.model.rotation, 0.12);
-                    }
+                if (state.hasSelected) {
+                    //move selected object along Y axis 
+                    //vec3.add(object.model.position, object.model.position, vec3.fromValues(0.0, -0.1, 0.0));
                 } else {
-                    if (state.hasSelected) {
-                        // TODO : move selected object along Y axis 
-                        vec3.add(object.model.position, object.model.position, vec3.fromValues(0.0, -0.1, 0.0));
-                    } else {
-                        // TODO: move camera along Y axis
-                        vec3.add(state.camera.center, state.camera.center, vec3.fromValues(0.0, -0.1, 0.0));
-                        vec3.add(state.camera.position, state.camera.position, vec3.fromValues(0.0, -0.1, 0.0));
-                    }
-                }
+                    //move camera along Y axis
+                    vec3.add(state.camera.center, state.camera.center, vec3.fromValues(0.0, -0.1, 0.0));
+                    vec3.add(state.camera.position, state.camera.position, vec3.fromValues(0.0, -0.1, 0.0));
+               }
                 break;
             case "Space":
-                // TODO: Highlight
+                //jumpu
+                //basically, do the upward movement for 10 ticks or until bonking head
+
+                //only jump if not already jumping
+                if (object.jump === 0){
+                    object.jump++;  //increment tick counter to 1
+                }
+
+                //Handle actual jump movement alongside collision
+
+                break;
+            case "CapsLock":
+                //switch between object/camera movement
                 if (!state.hasSelected) {
                     state.hasSelected = true;
-                    changeSelectionText(state.objects[state.selectedIndex].name);
-                    // TODO scale object here 
-                    vec3.multiply(state.objects[state.selectedIndex].model.scale,
-                                state.objects[state.selectedIndex].model.scale,
-                                vec3.fromValues(1.2, 1.2, 1.2));
-
-
                 }
                 else {
                     state.hasSelected = false;
-                    document.getElementById("selectionText").innerHTML = "Selection: None";
-                    // TODO scale back object here 
-
-                    vec3.multiply(state.objects[state.selectedIndex].model.scale,
-                                state.objects[state.selectedIndex].model.scale,
-                                vec3.fromValues(0.85, 0.85, 0.85));
-
-                }
-
-                break;
-            case "ArrowLeft":
-                // Decreases object selected index value
-                if (state.hasSelected) {
-                    if (state.selectedIndex > 0) {
-                        //TODO: scale the selected object and descale the previously selected object, set state.selectedIndex to new value
-                        vec3.multiply(state.objects[state.selectedIndex].model.scale,
-                        state.objects[state.selectedIndex].model.scale,
-                        vec3.fromValues(0.85, 0.85, 0.85));
-
-                        state.selectedIndex--;
-
-                        vec3.multiply(state.objects[state.selectedIndex].model.scale,
-                        state.objects[state.selectedIndex].model.scale,
-                        vec3.fromValues(1.2, 1.2, 1.2));
-                    }
-                    else if (state.selectedIndex == 0) {
-                        //TODO: scale the selected object and descale the previously selected object, set state.selectedIndex to new value
-                        vec3.multiply(state.objects[state.selectedIndex].model.scale,
-                        state.objects[state.selectedIndex].model.scale,
-                        vec3.fromValues(0.85, 0.85, 0.85));
-
-                        state.selectedIndex = state.objects.length - 1;
-
-                        vec3.multiply(state.objects[state.selectedIndex].model.scale,
-                        state.objects[state.selectedIndex].model.scale,
-                        vec3.fromValues(1.2, 1.2, 1.2));
-                    }
-                    else {
-                        //TODO: scale the selected object and descale the previously selected object, set state.selectedIndex to new value
-                        vec3.multiply(state.objects[state.selectedIndex].model.scale,
-                        state.objects[state.selectedIndex].model.scale,
-                        vec3.fromValues(0.85, 0.85, 0.85));
-
-                        state.selectedIndex--;
-
-                        vec3.multiply(state.objects[state.selectedIndex].model.scale,
-                        state.objects[state.selectedIndex].model.scale,
-                        vec3.fromValues(1.2, 1.2, 1.2));
-                    }
-                    //changes the text to the object that is selected
-                    changeSelectionText(state.objects[state.selectedIndex].name);
+                    //document.getElementById("selectionText").innerHTML = "Selection: None";
                 }
                 break;
-            case "ArrowRight":
-                // Increases object selected index value
-                if (state.hasSelected) {
-                    if (state.selectedIndex < state.objects.length - 1) {
-                        //TODO: scale the selected object and descale the previously selected object, set state.selectedIndex to new value
-                        vec3.multiply(state.objects[state.selectedIndex].model.scale,
-                        state.objects[state.selectedIndex].model.scale,
-                        vec3.fromValues(0.85, 0.85, 0.85));                        
+            case "Backquote":
+                //toggle camera mode
 
-                        state.selectedIndex++;
+                if (!state.isFirstPerson){
+                    //enable first person controls flag
+                    state.isFirstPerson = true;     //causes camera + controls to update for first person
 
-                        vec3.multiply(state.objects[state.selectedIndex].model.scale,
-                        state.objects[state.selectedIndex].model.scale,
-                        vec3.fromValues(1.2, 1.2, 1.2));
-                    }
-                    else {
-                        //TODO: scale the selected object and descale the previously selected object, set state.selectedIndex to new value
-                        vec3.multiply(state.objects[state.selectedIndex].model.scale,
-                        state.objects[state.selectedIndex].model.scale,
-                        vec3.fromValues(0.85, 0.85, 0.85));  
-
-                        state.selectedIndex = 0;
-
-                        vec3.multiply(state.objects[state.selectedIndex].model.scale,
-                        state.objects[state.selectedIndex].model.scale,
-                        vec3.fromValues(1.2, 1.2, 1.2));                          
-                    }
-                    changeSelectionText(state.objects[state.selectedIndex].name);
+                    //change view to first person 
+                    
+                    state.camera.position[0] = object.model.position[0] + 1;    //front side of player
+                    state.camera.position[1] = object.model.position[1] + 1;    //top of player
+                    state.camera.position[2] = object.model.position[2] + 0.5;  //center of player
+                    
+                    //Potential adjustment for tallboye
+                    vec3.add(state.camera.position, state.camera.position, vec3.fromValues(0.0, 1.0, 0.0));
+                    
+                    //update camera.center
+                    state.camera.center = vec3.fromValues(state.camera.position[0] + 1,
+                                                        state.camera.position[1],
+                                                        state.camera.position[2]);
+                }
+                else{
+                    //disable first person control flag
+                    state.isFirstPerson = false;    //causes camera + controls to update for third person
+                    //change view back to default
+                    //Default view: x = player's position, y = position+5, z = 15 units back
+                    state.camera.position[0] = object.model.position[0];
+                    state.camera.position[1] = object.model.position[1] + 5.0;
+                    state.camera.position[2] = 15.0;
+                    
+                    //looking straight at the scene
+                    state.camera.center[0] = object.model.position[0];          //align camera with player x val
+                    state.camera.center[1] = object.model.position[1] + 5.0;    //look above object, slightly
+                    state.camera.center[2] = 0.0;   //look towards scene
                 }
                 break;
             default:
