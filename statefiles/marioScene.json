@@ -1,0 +1,97 @@
+
+{
+    "objects" : [
+        {
+            "name" : "apple",
+            "material" : {"diffuse" : [0.8, 0.2, 0.2], "ambient": [0.001, 0.001, 0.001], "specular": [0.8, 0.8, 0.8], "n":50, "alpha":1.0},
+            "type": "mesh",
+            "model" : "./models/apple.obj",
+            "parent" : null,
+            "position": [0.0, 0.0, 1.0],
+            "scale": [2.0, 2.0, 2.0]
+        },
+        {
+            "name" : "marinario",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.001, 0.001, 0.001], "specular": [0.8, 0.8, 0.8], "n":12, "alpha":1.0},
+            "type": "mesh",
+            "model" : "./models/mario.obj",
+            "parent" : null,
+            "position": [0.25, 0.5, 0.25],
+            "scale": [0.5, 0.5, 0.5]
+        },
+        {
+            "name" : "goomba",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.001, 0.001, 0.001], "specular": [0.8, 0.8, 0.8], "n":12, "alpha":1.0},
+            "type": "mesh",
+            "model" : "./models/goomba.obj",
+            "parent" : null,
+            "position": [1.0, 0, 1.0],
+            "scale": [1.0, 1.0, 1.0]
+        },
+        {
+            "name" : "koopaBod",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.001, 0.001, 0.001], "specular": [0.8, 0.8, 0.8], "n":12, "alpha":1.0},
+            "type": "mesh",
+            "model" : "./models/koopaBod.obj",
+            "parent" : null,
+            "position": [1.0, 0, 1.0],
+            "scale": [0.25, 0.25, 0.25]
+        },
+        {
+            "name" : "koopaAppendages",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.001, 0.001, 0.001], "specular": [0.8, 0.8, 0.8], "n":12, "alpha":1.0},
+            "type": "mesh",
+            "model" : "./models/koopaAppendages.obj",
+            "parent" : null,
+            "position": [1.0, 0, 1.0],
+            "scale": [0.25, 0.25, 0.25]
+        },
+        {
+            "name" : "platform0",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.1, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
+            "type": "cube",
+            "texture": "./materials/plywood.jpg",
+            "parent" : null,
+            "position": [0.0, 0.0, 0.0],
+            "scale": [1.0, 1.0, 30.0]
+        },
+        {
+            "name" : "platform1",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.1, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
+            "type": "cube",
+            "texture": "./materials/plywood.jpg",
+            "parent" : null,
+            "position": [0.0, 3.0, 7.0],
+            "scale": [1.0, 1.0, 5.0]
+        },
+        {
+            "name" : "platform2",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.1, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
+            "type": "cube",
+            "texture": "./materials/plywood.jpg",
+            "parent" : null,
+            "position": [0.0, 6.0, 10],
+            "scale": [1.0, 1.0, 30.0]
+        },
+        {
+            "name": "light0",
+            "type": "light",
+            "model" : "./models/lightbulb.obj",
+            "position" : [-1.45, 0.8, -1.5],
+            "material" : {"diffuse" : [1.0, 1.0, 1.0], "ambient": [0.1, 0.1, 0.1], "specular": [0.3, 0.3, 0.3], "n":1000, "alpha":1.0},
+            "colour" : [1.0, 1.0, 1.0],
+            "parent" : null,
+            "strength" : 0.75
+        },
+        {
+            "name": "light1",
+            "type": "light",
+            "model" : "./models/lightbulb.obj",
+            "position" : [1.9, 0.8, 2.5],
+            "material" : {"diffuse" : [1.0, 1.0, 1.0], "ambient": [0.1, 0.1, 0.1], "specular": [0.3, 0.3, 0.3], "n":1000, "alpha":1.0},
+            "colour" : [1.0, 1.0, 1.0],
+            "parent" : null,
+            "strength" : 0.75
+        }
+    ]
+}
