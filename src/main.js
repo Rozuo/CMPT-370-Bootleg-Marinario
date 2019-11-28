@@ -9,9 +9,9 @@ window.onload = () => {
 }
 
 /**
- * 
- * @param {object - contains vertex, normal, uv information for the mesh to be made} mesh 
- * @param {object - the game object that will use the mesh information} object 
+ *
+ * @param {object - contains vertex, normal, uv information for the mesh to be made} mesh
+ * @param {object - the game object that will use the mesh information} object
  * @purpose - Helper function called as a callback function when the mesh is done loading for the object
  */
 function createMesh(mesh, object) {
@@ -40,10 +40,10 @@ function createMesh(mesh, object) {
 }
 
 /**
- * 
- * @param {string - type of object to be added to the scene} type 
- * @param {string - url of the model being added to the game} url 
- * @purpose **WIP** Adds a new object to the scene from using the gui to add said object 
+ *
+ * @param {string - type of object to be added to the scene} type
+ * @param {string - url of the model being added to the game} url
+ * @purpose **WIP** Adds a new object to the scene from using the gui to add said object
  */
 function addObject(type, url = null) {
     if (type === "Cube") {
@@ -84,7 +84,7 @@ function main() {
         uniform mat4 uViewMatrix;
         uniform mat4 uModelMatrix;
         uniform mat4 normalMatrix;
-        
+
         out vec3 oFragPosition;
         out vec3 oCameraPosition;
         out vec3 oNormal;
@@ -115,7 +115,7 @@ function main() {
         in vec3 normalInterp;
         in vec2 oUV;
         in vec3 oVertBitang;
-        
+
         uniform vec3 uCameraPosition;
         uniform int numLights;
         uniform vec3 diffuseVal;
@@ -130,7 +130,7 @@ function main() {
         uniform vec3 uLightPositions[MAX_LIGHTS];
         uniform vec3 uLightColours[MAX_LIGHTS];
         uniform float uLightStrengths[MAX_LIGHTS];
-     
+
         out vec4 fragColor;
 
         void main() {
@@ -181,7 +181,7 @@ function main() {
             } else {
                 fragColor = vec4(ambient + diffuse + specular, 1.0);
             }
-            
+
         }
         `;
 
@@ -249,9 +249,9 @@ function main() {
 }
 
 /**
- * 
- * @param {object - object containing scene values} state 
- * @param {object - the object to be added to the scene} object 
+ *
+ * @param {object - object containing scene values} state
+ * @param {object - the object to be added to the scene} object
  * @purpose - Helper function for adding a new object to the scene and refreshing the GUI
  */
 function addObjectToScene(state, object) {
@@ -269,9 +269,9 @@ function addObjectToScene(state, object) {
 }
 
 /**
- * 
- * @param {gl context} gl 
- * @param {object - object containing scene values} state 
+ *
+ * @param {gl context} gl
+ * @param {object - object containing scene values} state
  * @purpose - Calls the drawscene per frame
  */
 function startRendering(gl, state) {
@@ -294,17 +294,30 @@ function startRendering(gl, state) {
                 state.gameStarted = true;
             }
 
+            var bgm = document.getElementById("overworld");
+            bgm.loop=true;
+            bgm.play();
+
             if (state.keyboard["w"]) {
                 moveForward(state);
+                //console.log("w pressed");
+                //document.getElementById("powerup").play();
             }
             if (state.keyboard["s"]) {
                 moveBackward(state);
+                //document.getElementById("stageclear").play();
             }
             if (state.keyboard["a"]) {
                 moveLeft(state);
+                //document.getElementById("jumplarge").play();
             }
             if (state.keyboard["d"]) {
                 moveRight(state);
+                //document.getElementById("1up").play();
+            }
+            if (state.keyboard[" "]){//spacebar
+              //console.log("space pressed");
+              //document.getElementById("jumpsmall").play();
             }
 
             if (state.mouse['camMove']) {
@@ -332,10 +345,10 @@ function startRendering(gl, state) {
 }
 
 /**
- * 
- * @param {gl context} gl 
- * @param {float - time from now-last} deltaTime 
- * @param {object - contains the state for the scene} state 
+ *
+ * @param {gl context} gl
+ * @param {float - time from now-last} deltaTime
+ * @param {object - contains the state for the scene} state
  * @purpose Iterate through game objects and render the objects aswell as update uniforms
  */
 function drawScene(gl, deltaTime, state) {
@@ -433,7 +446,7 @@ function drawScene(gl, deltaTime, state) {
                         gl.uniform1i(object.programInfo.uniformLocations.samplerExists, state.samplerExists);
                         gl.uniform1i(object.programInfo.uniformLocations.sampler, 0);
                         gl.bindTexture(gl.TEXTURE_2D, object.model.texture);
-                        
+
                     } else {
                         gl.activeTexture(gl.TEXTURE0);
                         state.samplerExists = 0;

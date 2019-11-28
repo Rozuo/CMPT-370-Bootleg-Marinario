@@ -6,7 +6,7 @@
 
 /*
 TODO:
-Fix movement controls 
+Fix movement controls
     - applies only to player
     - Maybe try a4 pt 1, look at the drawscene
 DrawScene: Move down unless collision
@@ -53,7 +53,7 @@ function main() {
             state = setupDrawing(gl, canvas, inputTriangles);
 
 
-            //initial transforms of fingers 
+            //initial transforms of fingers
 
             // translate arm with 0.5
             arm = getObjectByName(state, "arm");
@@ -63,10 +63,10 @@ function main() {
 
             player = getObjectByName(state, "finger0");
             finger1 = getObjectByName(state, "finger1");
-            
+
             player.model.position = vec3.fromValues(0.0, 0.0, 0.0);
             finger1.model.position = vec3.fromValues(10.0, 4.0, 0.0);
-            
+
 
             setupKeypresses(state);
 
@@ -129,9 +129,9 @@ function setupDrawing(gl, canvas, inputTriangles) {
             theta: Math.PI / 2.0,
         },
         isFirstPerson: false,
-        // TODO link this to a uniform and update at rendering 
+        // TODO link this to a uniform and update at rendering
         // you can then use in the shader to test if the curent object has texture or not
-        samplerExists: false 
+        samplerExists: false
     };
 
     for (var i = 0; i < inputTriangles.length; i++) {
@@ -157,7 +157,7 @@ function setupDrawing(gl, canvas, inputTriangles) {
             }
         );
 
-        // TODO include texture coords in the call 
+        // TODO include texture coords in the call
         initBuffers(gl, state.objects[i], tri.vertices.flat(), tri.normals.flat(),  tri.triangles.flat(), tri.uvs.flat());
     }
 
@@ -194,7 +194,7 @@ function startRendering(gl, state) {
 
 /**
  * Draws the scene. Should be called every frame
- * 
+ *
  * @param  {} gl WebGL2 context
  * @param {number} deltaTime Time between each rendering call
  */
@@ -218,11 +218,11 @@ function drawScene(gl, deltaTime, state) {
     // This will replace everything that was in the previous frame with the clear colour.
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    // TODO sort objects 
+    // TODO sort objects
     // see lab9 for an example
     var sortedObjects = state.objects.sort((a, b) => {
         return (vec3.distance(b.model.position, state.camera.position) - vec3.distance(a.model.position, state.camera.position));
-    }); 
+    });
 
     sortedObjects.forEach((object) => {
         // Choose to use our shader
@@ -234,15 +234,15 @@ function drawScene(gl, deltaTime, state) {
            // we do the transparency here and depth mask
             if (object.materialList.alpha < 1.0) {
                 // TODO turn off depth masking
-                // enable blending and specify blending function 
-                // clear depth for correct transparency rendering 
+                // enable blending and specify blending function
+                // clear depth for correct transparency rendering
                 gl.depthMask(false);
                 gl.enable(gl.BLEND);
                 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-                
+
             }
             else {
-                // TODO disable blending 
+                // TODO disable blending
                 // enable depth masking and z-buffering
                 // specify depth function
                 // clear depth with 1.0
@@ -252,7 +252,7 @@ function drawScene(gl, deltaTime, state) {
                 gl.depthFunc(gl.LEQUAL);
                 //gl.clearDepth(1.0);
             }
-            
+
             var projectionMatrix = mat4.create();
             var fovy = 60.0 * Math.PI / 180.0; // Vertical field of view in radians
             var aspect = state.canvas.clientWidth / state.canvas.clientHeight; // Aspect ratio of the canvas
@@ -332,7 +332,7 @@ function drawScene(gl, deltaTime, state) {
             gl.uniform1f(object.programInfo.uniformLocations.alphaValue, object.materialList.alpha);
         }
 
-        // Draw 
+        // Draw
         {
             // Bind the buffer we want to draw
             gl.bindVertexArray(object.buffers.vao);
@@ -340,11 +340,11 @@ function drawScene(gl, deltaTime, state) {
             // part 1
             if (object.texture != null) {
                 state.samplerExists = 0;
-                // TODO link this variable to uniform 
+                // TODO link this variable to uniform
                 gl.uniform1i(object.programInfo.uniformLocations.samplerExist, state.samplerExists);
 
                 // TODO update fragment shader uniform for texture sampler using object.texture
-                // you will need to also bind (gl.bindTexture) 
+                // you will need to also bind (gl.bindTexture)
                 // and activate (gl.activeTexture) the object.texture as you are working with multiple textures
                 // look at loadTextures to see how this is done
                 gl.bindTexture(gl.TEXTURE_2D, object.texture);
@@ -445,7 +445,7 @@ function setupKeypresses(state) {
                         //Move camera along Z axis
                         vec3.add(state.camera.center, state.camera.center, vec3.fromValues(0.0, 0.0, -0.1));
                         vec3.add(state.camera.position, state.camera.position, vec3.fromValues(0.0, 0.0, -0.1));
-                        
+
 
                     }
                 }
@@ -470,7 +470,7 @@ function setupKeypresses(state) {
                         //Move camera along Z axis (other direction)
                         vec3.add(state.camera.center, state.camera.center, vec3.fromValues(0.0, 0.0, 0.1));
                         vec3.add(state.camera.position, state.camera.position, vec3.fromValues(0.0, 0.0, 0.1));
-                        
+
                     }
                 }
                 break;
@@ -486,7 +486,7 @@ function setupKeypresses(state) {
                 break;
             case "KeyE":
                 if (state.hasSelected) {
-                    //move selected object along Y axis 
+                    //move selected object along Y axis
                     //vec3.add(object.model.position, object.model.position, vec3.fromValues(0.0, -0.1, 0.0));
                 } else {
                     //move camera along Y axis
@@ -497,6 +497,7 @@ function setupKeypresses(state) {
             case "Space":
                 //jumpu
                 //basically, do the upward movement for 10 ticks or until bonking head
+                
 
                 //only jump if not already jumping
                 if (object.jump === 0){
@@ -523,15 +524,15 @@ function setupKeypresses(state) {
                     //enable first person controls flag
                     state.isFirstPerson = true;     //causes camera + controls to update for first person
 
-                    //change view to first person 
-                    
+                    //change view to first person
+
                     state.camera.position[0] = object.model.position[0] + 1;    //front side of player
                     state.camera.position[1] = object.model.position[1] + 1;    //top of player
                     state.camera.position[2] = object.model.position[2] + 0.5;  //center of player
-                    
+
                     //Potential adjustment for tallboye
                     vec3.add(state.camera.position, state.camera.position, vec3.fromValues(0.0, 1.0, 0.0));
-                    
+
                     //update camera.center
                     state.camera.center = vec3.fromValues(state.camera.position[0] + 1,
                                                         state.camera.position[1],
@@ -545,7 +546,7 @@ function setupKeypresses(state) {
                     state.camera.position[0] = object.model.position[0];
                     state.camera.position[1] = object.model.position[1] + 5.0;
                     state.camera.position[2] = 15.0;
-                    
+
                     //looking straight at the scene
                     state.camera.center[0] = object.model.position[0];          //align camera with player x val
                     state.camera.center[1] = object.model.position[1] + 5.0;    //look above object, slightly
@@ -572,13 +573,13 @@ function textureShader(gl) {
         `#version 300 es
     in vec3 aPosition;
     in vec3 aNormal;
-    
+
     uniform mat4 uProjectionMatrix;
     uniform mat4 uViewMatrix;
     uniform mat4 uModelMatrix;
     uniform mat4 normalMat;
     uniform vec3 uCameraPosition;
-    
+
     out vec3 normalInterp;
     out vec3 oNormal;
     out vec3 oFragPosition;
@@ -586,12 +587,12 @@ function textureShader(gl) {
     // TODO add in/out texture coords
     in vec2 aUV;
     out vec2 oUV;
-   
+
 
     void main() {
         // Position needs to be a vec4 with w as 1.0
         gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(aPosition, 1.0);
-        
+
         // Postion of the fragment in world space
         oFragPosition = (uModelMatrix * vec4(aPosition, 1.0)).xyz;
 
@@ -614,7 +615,7 @@ function textureShader(gl) {
     in vec3 oFragPosition;
     in vec3 oCameraPosition;
     in vec3 normalInterp;
-    
+
     // part 1
     // TODO add incoming texture coords
     in vec2 oUV;
@@ -626,13 +627,13 @@ function textureShader(gl) {
     uniform vec3 specularVal;
     uniform float nVal;
     uniform float alphaVal;
-    
+
     // part 1
     // TODO add light related uniforms : position, color, strength
     uniform vec3 lightPosition;
     uniform vec3 lightColor;
     uniform float lightStrength;
-    
+
     // part 1
     // TODO add texture sampler
     uniform sampler2D uTexture;
@@ -643,12 +644,12 @@ function textureShader(gl) {
 
     void main() {
         vec3 normal = normalize(normalInterp);
-        
+
         // TODO: Ambient term
         vec3 ambient = ambientVal * lightStrength;
 
         // TODO : Diffuse term : Ld * (N dot L)
-        // We don't multiply Kd for now as it changes with texture 
+        // We don't multiply Kd for now as it changes with texture
         vec3 lightDirection = normalize(lightPosition - oFragPosition);
         vec3 diffuse = lightColor * max(dot(oNormal, lightDirection), 0.0);
 
@@ -660,17 +661,17 @@ function textureShader(gl) {
         float spec = pow(max(dot(h, normal), 0.0), nVal);
         vec3 specular = vec3(1.0, 1.0, 1.0) * spec;
 
-        // TODO calculate diffusecolor for texture and no-texture  
-        // and mix with term you computed before 
-        
+        // TODO calculate diffusecolor for texture and no-texture
+        // and mix with term you computed before
+
         // part 1 & 2
         if(textureExist == 0){
-            // get texture 
+            // get texture
             vec4 textureColor = texture(uTexture, oUV);
-            
+
             // multiply into the diffuse light strength and the color. Light strength for the scale on a fragment
             diffuse = diffuse * lightStrength * diffuseVal;
-            
+
             // vec3 mixDiffuse = mix(diffuseVal, textureColor.rgb, 0.7);
             // diffuse = diffuse * mixDiffuse;
 
@@ -694,8 +695,8 @@ function textureShader(gl) {
         program: shaderProgram,
         // The attribute locations. WebGL will use there to hook up the buffers to the shader program.
         // NOTE: it may be wise to check if these calls fail by seeing that the returned location is not -1.
-        
-        
+
+
         // setting up uniforms and attributes here
         attribLocations: {
             vertexPosition: gl.getAttribLocation(shaderProgram, 'aPosition'),
@@ -715,10 +716,10 @@ function textureShader(gl) {
             // TODO uniforms for light
             light0Position: gl.getUniformLocation(shaderProgram, 'lightPosition'),
             light0Colour: gl.getUniformLocation(shaderProgram, 'lightColor'),
-            light0Strength: gl.getUniformLocation(shaderProgram, 'lightStrength'), 
-            
+            light0Strength: gl.getUniformLocation(shaderProgram, 'lightStrength'),
+
             // part 1
-            // TODO uniforms for material properties 
+            // TODO uniforms for material properties
             ambientValue: gl.getUniformLocation(shaderProgram, 'ambientVal'),
             specularValue: gl.getUniformLocation(shaderProgram, 'specularVal'),
             nValue: gl.getUniformLocation(shaderProgram, 'nVal'),
@@ -733,7 +734,7 @@ function textureShader(gl) {
             samplerExist: gl.getUniformLocation(shaderProgram, 'textureExist'),
 
             diffuseValue: gl.getUniformLocation(shaderProgram, "diffuseVal"),
-            
+
         },
     };
 
@@ -768,7 +769,7 @@ function textureShader(gl) {
 /************************************
  * BUFFER SETUP
  ************************************/
-// TODO add texture coords array as argument 
+// TODO add texture coords array as argument
 function initBuffers(gl, object, positionArray, normalArray, indicesArray, textureCoordArray) {
 
     // We have 3 vertices with x, y, and z values
@@ -777,7 +778,7 @@ function initBuffers(gl, object, positionArray, normalArray, indicesArray, textu
     const normals = new Float32Array(normalArray);
 
     // part 1
-    // TODO array for texture coordinates 
+    // TODO array for texture coordinates
     const textureCoords = new Float32Array(textureCoordArray);
     // console.log("textureCoord: ", textureCoords);
 
@@ -940,7 +941,7 @@ function initTextureCoords(gl, programInfo, textureCoords) {
         }
 
         // TODO: Create and populate a buffer for the UV coordinates
-        
+
         return textureCoordBuffer;
     }
     console.log("lul it failed");
