@@ -15,6 +15,7 @@
             "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.001, 0.001, 0.001], "specular": [0.8, 0.8, 0.8], "n":12, "alpha":1.0},
             "type": "mesh",
             "model" : "./models/mario.obj",
+            "texture": "./materials/PepsiMan.jpg",
             "parent" : null,
             "position": [1.0, 0, 1.0],
             "scale": [1.0, 1.0, 1.0]
@@ -25,7 +26,7 @@
             "type": "mesh",
             "model" : "./models/goomba.obj",
             "parent" : null,
-            "position": [1.0, 0, 1.0],
+            "position": [5.0, -1.0, 7.0],
             "scale": [1.0, 1.0, 1.0]
         },
         {
