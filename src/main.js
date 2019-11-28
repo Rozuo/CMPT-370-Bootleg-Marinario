@@ -301,23 +301,23 @@ function startRendering(gl, state) {
             if (state.keyboard["w"]) {
                 moveForward(state);
                 //console.log("w pressed");
-                document.getElementById("powerup").play();
+                //document.getElementById("powerup").play();
             }
             if (state.keyboard["s"]) {
                 moveBackward(state);
-                document.getElementById("stageclear").play();
+                //document.getElementById("stageclear").play();
             }
             if (state.keyboard["a"]) {
                 moveLeft(state);
-                document.getElementById("jumplarge").play();
+                //document.getElementById("jumplarge").play();
             }
             if (state.keyboard["d"]) {
                 moveRight(state);
-                document.getElementById("1up").play();
+                //document.getElementById("1up").play();
             }
             if (state.keyboard[" "]){//spacebar
               //console.log("space pressed");
-              document.getElementById("jumpsmall").play();
+              //document.getElementById("jumpsmall").play();
             }
 
             if (state.mouse['camMove']) {
