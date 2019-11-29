@@ -19,7 +19,6 @@ function startGame(state) {
     })
 
     document.addEventListener('keypress', (event) => {
-        //console.log(event.key);
         switch (event.code) {
             case "KeyW":
                 state.keyboard[event.key] = true;
@@ -37,8 +36,21 @@ function startGame(state) {
                 state.keyboard[event.key] = true;
                 break;
 
+            case "KeyC":
+                if (state.keyboard[event.key] === true){
+                    state.keyboard[event.key] = false;
+                } else {
+                    state.keyboard[event.key] = true;
+                }
+
+
+                //state.keyboard[event.key] = true;       
+                break;     
             case "Space":
-                state.keyboard[event.key] = true;
+                //jump
+                if (state.jump === 0){
+                    state.jump = 30;
+                }
                 break;
 
             default:
@@ -61,10 +73,6 @@ function startGame(state) {
                 break;
 
             case "KeyD":
-                state.keyboard[event.key] = false;
-                break;
-
-            case "Space":
                 state.keyboard[event.key] = false;
                 break;
 

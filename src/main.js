@@ -3,15 +3,19 @@ var state = {};
 // mario model from https://sketchfab.com/3d-models/rigged-mario-free-099c5106369e4e7db70876c320e9a634
 // koopa model from https://www.turbosquid.com/FullPreview/Index.cfm/ID/1301668
 // goomba model from https://www.turbosquid.com/FullPreview/Index.cfm/ID/1292471
+
+//centroid attribute not needed? Might save time at load to remove if having performance issues
+    //eg: it calculates centroid for objects with tens of thousands of verts
+
 var stats = new Stats();
 window.onload = () => {
     parseSceneFile("./statefiles/marioScene.json", state, main);
 }
 
 /**
- *
- * @param {object - contains vertex, normal, uv information for the mesh to be made} mesh
- * @param {object - the game object that will use the mesh information} object
+ * 
+ * @param {object - contains vertex, normal, uv information for the mesh to be made} mesh 
+ * @param {object - the game object that will use the mesh information} object 
  * @purpose - Helper function called as a callback function when the mesh is done loading for the object
  */
 function createMesh(mesh, object) {
@@ -40,10 +44,10 @@ function createMesh(mesh, object) {
 }
 
 /**
- *
- * @param {string - type of object to be added to the scene} type
- * @param {string - url of the model being added to the game} url
- * @purpose **WIP** Adds a new object to the scene from using the gui to add said object
+ * 
+ * @param {string - type of object to be added to the scene} type 
+ * @param {string - url of the model being added to the game} url 
+ * @purpose **WIP** Adds a new object to the scene from using the gui to add said object 
  */
 function addObject(type, url = null) {
     if (type === "Cube") {
@@ -84,7 +88,7 @@ function main() {
         uniform mat4 uViewMatrix;
         uniform mat4 uModelMatrix;
         uniform mat4 normalMatrix;
-
+        
         out vec3 oFragPosition;
         out vec3 oCameraPosition;
         out vec3 oNormal;
@@ -115,7 +119,7 @@ function main() {
         in vec3 normalInterp;
         in vec2 oUV;
         in vec3 oVertBitang;
-
+        
         uniform vec3 uCameraPosition;
         uniform int numLights;
         uniform vec3 diffuseVal;
@@ -130,7 +134,7 @@ function main() {
         uniform vec3 uLightPositions[MAX_LIGHTS];
         uniform vec3 uLightColours[MAX_LIGHTS];
         uniform float uLightStrengths[MAX_LIGHTS];
-
+     
         out vec4 fragColor;
 
         void main() {
@@ -181,7 +185,7 @@ function main() {
             } else {
                 fragColor = vec4(ambient + diffuse + specular, 1.0);
             }
-
+            
         }
         `;
 
@@ -197,10 +201,13 @@ function main() {
         keyboard: {},
         mouse: { sensitivity: 0.2 },
         gameStarted: false,
+
+        isFirstPerson: false,
+        jump: 0,
         camera: {
             name: 'camera',
-            position: vec3.fromValues(0.5, 0.0, -2.5),
-            center: vec3.fromValues(0.5, 0.0, 0.0),
+            position: vec3.fromValues(-10.0, 4.0, 0.0),
+            center: vec3.fromValues(0.0, 4.0, 0.0),
             up: vec3.fromValues(0.0, 1.0, 0.0),
             pitch: 0,
             yaw: 0,
@@ -245,13 +252,15 @@ function main() {
     canvas.addEventListener('click', (event) => {
         getMousePick(event, state);
     }) */
+
+
     startRendering(gl, state);
 }
 
 /**
- *
- * @param {object - object containing scene values} state
- * @param {object - the object to be added to the scene} object
+ * 
+ * @param {object - object containing scene values} state 
+ * @param {object - the object to be added to the scene} object 
  * @purpose - Helper function for adding a new object to the scene and refreshing the GUI
  */
 function addObjectToScene(state, object) {
@@ -269,9 +278,9 @@ function addObjectToScene(state, object) {
 }
 
 /**
- *
- * @param {gl context} gl
- * @param {object - object containing scene values} state
+ * 
+ * @param {gl context} gl 
+ * @param {object - object containing scene values} state 
  * @purpose - Calls the drawscene per frame
  */
 function startRendering(gl, state) {
@@ -287,6 +296,9 @@ function startRendering(gl, state) {
 
         state.deltaTime = deltaTime;
 
+        let player = getObject(state, "marinario");
+        let platform1 = getObject(state, "platform1");
+
         //wait until the scene is completely loaded to render it
         if (state.numberOfObjectsToLoad <= state.objects.length) {
             if (!state.gameStarted) {
@@ -294,42 +306,122 @@ function startRendering(gl, state) {
                 state.gameStarted = true;
             }
 
-            var bgm = document.getElementById("overworld");
-            bgm.loop=true;
-            bgm.play();
-
+            //PLAYER DIRECTION
             if (state.keyboard["w"]) {
-                moveForward(state);
-                //console.log("w pressed");
-                //document.getElementById("powerup").play();
+                //forward, first person
+                vec3.add(player.model.position, player.model.position, vec3.fromValues(0.0, 0.0, 0.2));
             }
             if (state.keyboard["s"]) {
-                moveBackward(state);
-                //document.getElementById("stageclear").play();
+                //backward, first person
+                vec3.add(player.model.position, player.model.position, vec3.fromValues(0.0, 0.0, -0.2));
             }
             if (state.keyboard["a"]) {
-                moveLeft(state);
-                //document.getElementById("jumplarge").play();
+                //forward while in "2d" view
+                vec3.add(player.model.position, player.model.position, vec3.fromValues(0.0, 0.0, -0.2));
             }
             if (state.keyboard["d"]) {
-                moveRight(state);
-                //document.getElementById("1up").play();
+                //backwards while in "2d" view
+                vec3.add(player.model.position, player.model.position, vec3.fromValues(0.0, 0.0, 0.2));
             }
-            if (state.keyboard[" "]){//spacebar
-              //console.log("space pressed");
-              //document.getElementById("jumpsmall").play();
+            //FREE CAMERA - requires disabling of camera toggle modes - for debug
+            if (state.keyboard["W"]) {
+                //camera (debug)
+                //moveForward(state);
+                
+                //player.model.scale[1]*=1.1;   //random scale test
+            }
+            if (state.keyboard["S"]) {
+                //camera (debug)
+                //moveBackward(state);
+                
+                //player.model.scale[1]*=0.9;   //random descale test
+            }
+            if (state.keyboard["A"]) {
+                //camera (debug)
+                moveLeft(state);
+            }
+            if (state.keyboard["D"]) {
+                //camera (debug)
+                moveRight(state);
             }
 
+            //JUMP!
+            if (state.jump > 0){
+                //console.log("jumpu");
+                //console.log(player);
+                state.jump--;   //decrease jump tick counter - see myGame.js for count
+                player.model.position[1] += 0.15;    //y value incease per tick - jump speed
+            }
+
+/*  Collision - omni, require variable name changes - hitbox required? 
+            if (rect1.x < rect2.x + rect2.width &&
+                rect1.x + rect1.width > rect2.x &&
+                rect1.y < rect2.y + rect2.height &&
+                rect1.y + rect1.height > rect2.y) {
+                console.log("collision");
+            }
+*/
+/*
+for all objects
+    if object.centroid is within a certain radius of player.position
+        check collision
+
+OR
+
+if player z value in a particular segment
+    for all objects in segment
+        check collision
+
+*/
+            //GRAVITY - can later adapt first line to pit-checker
+            if ((player.model.position[1] > 0.5) && (state.jump === 0)){
+
+                //collision testing - for platforms, can use .scale * 2 to find length
+                if (player.model.position[2] < platform1.model.position[2] + 2.5 && //2.5 = half scale
+                player.model.position[2] > platform1.model.position[2] &&
+                player.model.position[1] < platform1.model.position[1] + 0.5 &&
+                player.model.position[1] > platform1.model.position[1]) {
+                //console.log(player.model.position[2], platform1.model.position[2]);
+                player.model.position[1] += 0.15;
+            }
+                player.model.position[1] -= 0.15;   //fall value per tick
+            }
+
+            //toggle view to first person
+            if (state.keyboard["c"]) {
+
+                state.isFirstPerson = true;
+                state.camera.position[0] = player.model.position[0];        //center of player
+                state.camera.position[1] = player.model.position[1] + 1;    //top of player
+                state.camera.position[2] = player.model.position[2] + 0.5;  //front of player
+
+                //looking in front of player
+                state.camera.center = vec3.fromValues(player.model.position[0] + 0.25, 
+                                                    player.model.position[1]+1,
+                                                    player.model.position[2]+2);
+            }
+
+            //return view to "mock 2d"
+            if (!state.keyboard["c"]) {
+                state.isFirstPerson = false;
+                state.camera.position[0] = -10;     //at a distance, broad view
+                state.camera.position[1] = 5;       //positioned above player
+                state.camera.position[2] = player.model.position[2];    // = player z value
+
+                //looking straight on, slightly above player, at player z value
+                state.camera.center = vec3.fromValues(0, 5, player.model.position[2]);
+            }
+            
+            //Mouse-camera movement 0 debug
             if (state.mouse['camMove']) {
                 //vec3.rotateY(state.camera.center, state.camera.center, state.camera.position, (state.camera.yaw - 0.25) * deltaTime * state.mouse.sensitivity);
                 vec3.rotateY(state.camera.center, state.camera.center, state.camera.position, (-state.mouse.rateX * deltaTime * state.mouse.sensitivity));
             }
 
             let apple = getObject(state, "apple");
-            let alien = getObject(state, "marinario");
 
-            apple.centroid = alien.model.position;
-            mat4.rotateY(apple.model.rotation, apple.model.rotation, 0.3 * deltaTime);
+            //apple.centroid = player.model.position;
+            //mat4.rotateY(apple.model.rotation, apple.model.rotation, 0.3 * deltaTime);
 
 
             // Draw our scene
@@ -345,14 +437,15 @@ function startRendering(gl, state) {
 }
 
 /**
- *
- * @param {gl context} gl
- * @param {float - time from now-last} deltaTime
- * @param {object - contains the state for the scene} state
+ * 
+ * @param {gl context} gl 
+ * @param {float - time from now-last} deltaTime 
+ * @param {object - contains the state for the scene} state 
  * @purpose Iterate through game objects and render the objects aswell as update uniforms
  */
 function drawScene(gl, deltaTime, state) {
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+
+    gl.clearColor(0.6, 0.6, 0.99, 1.0);
     gl.enable(gl.DEPTH_TEST); // Enable depth testing
     gl.depthFunc(gl.LEQUAL); // Near things obscure far things
     gl.clearDepth(1.0); // Clear everything
@@ -396,7 +489,8 @@ function drawScene(gl, deltaTime, state) {
                 );
                 gl.uniformMatrix4fv(object.programInfo.uniformLocations.view, false, viewMatrix);
 
-               gl.uniform3fv(object.programInfo.uniformLocations.cameraPosition, state.camera.position);
+                gl.uniform3fv(object.programInfo.uniformLocations.cameraPosition, state.camera.position);
+
 
                 state.viewMatrix = viewMatrix;
 
@@ -446,7 +540,7 @@ function drawScene(gl, deltaTime, state) {
                         gl.uniform1i(object.programInfo.uniformLocations.samplerExists, state.samplerExists);
                         gl.uniform1i(object.programInfo.uniformLocations.sampler, 0);
                         gl.bindTexture(gl.TEXTURE_2D, object.model.texture);
-
+                        
                     } else {
                         gl.activeTexture(gl.TEXTURE0);
                         state.samplerExists = 0;
