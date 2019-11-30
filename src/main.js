@@ -247,14 +247,24 @@ function main() {
         }
     })
 
+    var platforms = [];
+    //populate array with platforms
+    //iterate through object list
+    for (let i = 0; i < state.objectCount; i++){
+        if (state.objects[i].name.substring(0, 8) === "platform"){
+            platforms.push(state.objects[i]);
+        }
+    }
+
+    console.log(platforms);
+
     //setup mouse click listener
     /*
     canvas.addEventListener('click', (event) => {
         getMousePick(event, state);
     }) */
+    startRendering(gl, state, platforms);
 
-
-    startRendering(gl, state);
 }
 
 /**
@@ -283,7 +293,7 @@ function addObjectToScene(state, object) {
  * @param {object - object containing scene values} state 
  * @purpose - Calls the drawscene per frame
  */
-function startRendering(gl, state) {
+function startRendering(gl, state, platforms) {
     // A variable for keeping track of time between frames
     var then = 0.0;
 
@@ -297,7 +307,6 @@ function startRendering(gl, state) {
         state.deltaTime = deltaTime;
 
         let player = getObject(state, "marinario");
-        let platform1 = getObject(state, "platform1");
 
         //wait until the scene is completely loaded to render it
         if (state.numberOfObjectsToLoad <= state.objects.length) {
@@ -354,12 +363,10 @@ function startRendering(gl, state) {
             }
 
 /*  Collision - omni, require variable name changes - hitbox required? 
-            if (rect1.x < rect2.x + rect2.width &&
-                rect1.x + rect1.width > rect2.x &&
-                rect1.y < rect2.y + rect2.height &&
-                rect1.y + rect1.height > rect2.y) {
-                console.log("collision");
-            }
+ if (player.model.position[2] < platform1.model.position[2] + 2.5 && //2.5 = half scale
+                player.model.position[2] > platform1.model.position[2] &&
+                player.model.position[1] < platform1.model.position[1] + 0.5 &&
+                player.model.position[1] > platform1.model.position[1]) {
 */
 /*
 for all objects
@@ -373,18 +380,25 @@ if player z value in a particular segment
         check collision
 
 */
-            //GRAVITY - can later adapt first line to pit-checker
-            if ((player.model.position[1] > 0.5) && (state.jump === 0)){
 
+            //GRAVITY - can later adapt first line to pit-checker
+            if ((player.model.position[1] > -0.5) && (state.jump === 0)){
+
+                var collision = 0;
                 //collision testing - for platforms, can use .scale * 2 to find length
-                if (player.model.position[2] < platform1.model.position[2] + 2.5 && //2.5 = half scale
-                player.model.position[2] > platform1.model.position[2] &&
-                player.model.position[1] < platform1.model.position[1] + 0.5 &&
-                player.model.position[1] > platform1.model.position[1]) {
-                //console.log(player.model.position[2], platform1.model.position[2]);
-                player.model.position[1] += 0.15;
+                for(let i = 0; i < platforms.length; i++){
+                    if (player.model.position[2] < platforms[i].model.position[2] + (platforms[i].model.scale[2] /2) && //2.5 = half scale
+                    player.model.position[2] > platforms[i].model.position[2] &&
+                    player.model.position[1] < platforms[i].model.position[1] + 0.5 &&
+                    player.model.position[1] > platforms[i].model.position[1]) {
+                        //player.model.position[1] += 0.15;
+                        collision = 1;
+                }
+
             }
-                player.model.position[1] -= 0.15;   //fall value per tick
+                if (collision === 0){
+                    player.model.position[1] -= 0.15;   //fall value per tick
+                }
             }
 
             //toggle view to first person
