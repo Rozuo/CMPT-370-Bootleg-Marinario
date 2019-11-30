@@ -16,7 +16,7 @@ window.onload = () => {
  */
 function createMesh(mesh, object) {
     if (object.type === "mesh") {
-        let testModel = new Model(state.gl, object.name, mesh, object.parent, object.material.ambient, object.material.diffuse, object.material.specular, object.material.n, object.material.alpha, object.texture);
+        let testModel = new Model(state.gl, object.name, mesh, object.parent, object.enemy, object.material.ambient, object.material.diffuse, object.material.specular, object.material.n, object.material.alpha, object.texture);
         testModel.vertShader = state.vertShaderSample;
         testModel.fragShader = state.fragShaderSample;
         testModel.setup();
@@ -313,9 +313,11 @@ function startRendering(gl, state) {
             }
 
             let apple = getObject(state, "apple");
-            let alien = getObject(state, "marinario");
+            let marinario = getObject(state, "marinario");
 
-            apple.centroid = alien.model.position;
+            enemyPatrol(getObject(state, "goomba"));
+            
+            apple.centroid = marinario.model.position;
             mat4.rotateY(apple.model.rotation, apple.model.rotation, 0.3 * deltaTime);
 
 
@@ -469,4 +471,48 @@ function drawScene(gl, deltaTime, state) {
             }
         }
     });
+}
+
+/**
+ * 
+ * @param {Object} obj 
+ */
+function enemyPatrol(obj){
+    if(typeof obj == "undefined"){
+        console.warn("WARNING: there is no objects in the state file");
+    }
+    var maxRange = vec3.create();
+    var minRange = vec3.create();
+    var positiveDirection = vec3.fromValues(0.0, 0.0, 0.01);
+    var fromWhichWay = true;
+    var negativeDirection = vec3.fromValues(0.0, 0.0, -0.01);
+    // if(obj.enemy){
+    //     vec3.add(maxRange, vec3.fromValues(0.0, 0.0, 2.0), obj.model.position);
+    //     vec3.subtract(minRange, vec3.fromValues(0.0, 0.0, 2.0), obj.model.position);
+    // }
+    // else{
+    //     return;
+    // }
+    if(obj.enemy != true){
+        return;
+    }
+    console.log(obj.maxRange);
+    console.log(obj.minRange);
+    // vec3.add(obj.model.position, obj.model.position, direction);
+    if(obj.model.position[2] >= obj.maxRange[2]){
+        vec3.add(obj.model.position, obj.model.position, negativeDirection);
+        obj.fromWhichWay = false;
+    }
+    else if(obj.model.position[2] <= obj.minRange[2]){
+        vec3.add(obj.model.position, obj.model.position, positiveDirection);
+        obj.fromWhichWay = true;
+    }
+    else{
+        if(obj.fromWhichWay == true){
+            vec3.add(obj.model.position, obj.model.position, positiveDirection);
+        }
+        else{
+            vec3.add(obj.model.position, obj.model.position, negativeDirection);
+        }
+    }
 }
