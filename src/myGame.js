@@ -49,7 +49,10 @@ function startGame(state) {
             case "Space":
                 //jump
                 if (state.jump === 0){
-                    state.jump = 30;
+                    if (state.collision){
+                        state.jump = 25;
+                    }
+
                 }
                 break;
 

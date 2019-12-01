@@ -204,6 +204,8 @@ function main() {
 
         isFirstPerson: false,
         jump: 0,
+        collision: 0,
+        previous: vec3.fromValues(0.0, 0.0, 0.25),
         camera: {
             name: 'camera',
             position: vec3.fromValues(-10.0, 4.0, 0.0),
@@ -307,6 +309,9 @@ function startRendering(gl, state, platforms) {
         state.deltaTime = deltaTime;
 
         let player = getObject(state, "marinario");
+        let apple = getObject(state, "apple");
+
+
 
         //wait until the scene is completely loaded to render it
         if (state.numberOfObjectsToLoad <= state.objects.length) {
@@ -315,10 +320,14 @@ function startRendering(gl, state, platforms) {
                 state.gameStarted = true;
             }
 
+            //keeps track of player's position from last frame - for collision direction detection
+            state.previous = vec3.fromValues(player.model.position[0], player.model.position[1], player.model.position[2]);
+
             //PLAYER DIRECTION
             if (state.keyboard["w"]) {
                 //forward, first person
                 vec3.add(player.model.position, player.model.position, vec3.fromValues(0.0, 0.0, 0.2));
+
             }
             if (state.keyboard["s"]) {
                 //backward, first person
@@ -326,6 +335,7 @@ function startRendering(gl, state, platforms) {
             }
             if (state.keyboard["a"]) {
                 //forward while in "2d" view
+                //TODO: direction facing tag, rotate object to face walking direction
                 vec3.add(player.model.position, player.model.position, vec3.fromValues(0.0, 0.0, -0.2));
             }
             if (state.keyboard["d"]) {
@@ -354,6 +364,8 @@ function startRendering(gl, state, platforms) {
                 moveRight(state);
             }
 
+            
+
             //JUMP!
             if (state.jump > 0){
                 //console.log("jumpu");
@@ -381,23 +393,90 @@ if player z value in a particular segment
 
 */
 
-            //GRAVITY - can later adapt first line to pit-checker
-            if ((player.model.position[1] > -0.5) && (state.jump === 0)){
+            //console.log(player.model.position[1], platforms[1].model.position[1]);
 
-                var collision = 0;
-                //collision testing - for platforms, can use .scale * 2 to find length
+
+            //GRAVITY - can later adapt loop to pit-checker
+            if ((player.model.position[1] > -0.5)){
+
+                state.collision = 0;
+                //collision testing - for platforms, can use "x".scale * 2 to find length
                 for(let i = 0; i < platforms.length; i++){
-                    if (player.model.position[2] < platforms[i].model.position[2] + (platforms[i].model.scale[2] /2) && //2.5 = half scale
-                    player.model.position[2] > platforms[i].model.position[2] &&
-                    player.model.position[1] < platforms[i].model.position[1] + 0.5 &&
-                    player.model.position[1] > platforms[i].model.position[1]) {
-                        //player.model.position[1] += 0.15;
-                        collision = 1;
+                    if (player.model.position[2] <= platforms[i].model.position[2] + (platforms[i].model.scale[2] /2) && //2.5 = half scale
+                    player.model.position[2] >= platforms[i].model.position[2] &&
+                    player.model.position[1] <= platforms[i].model.position[1] + 0.5 &&
+                    player.model.position[1] + 0.85 >= platforms[i].model.position[1]) {
+                        state.collision = 1;
+                        var collisionIndex = i;
                 }
 
             }
-                if (collision === 0){
-                    player.model.position[1] -= 0.15;   //fall value per tick
+                //if no collision and not jumping, fall
+                if (!state.collision){
+                    if (!state.jump){
+                        player.model.position[1] -= 0.15;   //fall value per tick
+
+                    }
+                }
+
+
+                //if collision
+                if (state.collision){
+                    //console.log(collision)
+                    //if player above
+                        //if object is an enemy
+                            //boom
+
+                    //if player was moving up
+                    if (state.previous[1] < player.model.position[1]){
+                        //headbonk, stop jump
+                        state.jump = 0;
+                        console.log("bonk");
+
+                        //release apple
+                        if(Math.abs(player.model.position[2] - apple.model.position[2]) < 0.5){
+                            if(Math.abs(player.model.position[1] - apple.model.position[1]) < 1){
+                                apple.model.position[1] += 0.5;
+                            }
+                        }
+
+                        player.model.position[1] -= 0.15;   //move down slightly to get out of collision
+
+                    }
+
+                    if(Math.abs(player.model.position[2] - apple.model.position[2]) < 0.5){
+                        if(Math.abs((player.model.position[1] + 0.25) - apple.model.position[1]) < 0.2){
+                            player.model.scale[1] *= 1.5;
+                            player.model.scale[2] *= 1.5;
+                            apple.model.position = vec3.fromValues(0.0, 0.0, -2.0);                                
+                        }
+                    }
+                    
+                    //if player was moving right (compare with object)
+                    if (state.previous[2] < platforms[collisionIndex].model.position[2]){
+                        player.model.position[2] -= 0.2;
+                        //state.keyboard["d"] = false;
+                        console.log("wham");
+                    }
+
+                    if (state.previous[2] > platforms[collisionIndex].model.position[2] + platforms[collisionIndex].model.scale[2] /2 ){
+                        player.model.position[2] += 0.2;
+                        //state.keyboard["d"] = false;
+                        console.log("bam");
+                    }
+
+                    //separate collision tests:        
+                        
+                        //if enemy
+                            //if player big
+                                //player becomes small
+                            //if player small
+                                //lose
+                        //if mushroom
+                            //get swole
+                                //player.model.scale[1] *= 1.5;
+                                //player.model.scale[2] *= 1.5;
+
                 }
             }
 
@@ -406,8 +485,8 @@ if player z value in a particular segment
 
                 state.isFirstPerson = true;
                 state.camera.position[0] = player.model.position[0];        //center of player
-                state.camera.position[1] = player.model.position[1] + 1;    //top of player
-                state.camera.position[2] = player.model.position[2] + 0.5;  //front of player
+                state.camera.position[1] = player.model.position[1] + 0.75;    //top of player
+                state.camera.position[2] = player.model.position[2] + 0.1;  //front of player
 
                 //looking in front of player
                 state.camera.center = vec3.fromValues(player.model.position[0] + 0.25, 
@@ -426,13 +505,16 @@ if player z value in a particular segment
                 state.camera.center = vec3.fromValues(0, 5, player.model.position[2]);
             }
             
+
+            //console.log(state.previous[2], player.model.position[2]);
+
             //Mouse-camera movement 0 debug
             if (state.mouse['camMove']) {
                 //vec3.rotateY(state.camera.center, state.camera.center, state.camera.position, (state.camera.yaw - 0.25) * deltaTime * state.mouse.sensitivity);
                 vec3.rotateY(state.camera.center, state.camera.center, state.camera.position, (-state.mouse.rateX * deltaTime * state.mouse.sensitivity));
             }
 
-            let apple = getObject(state, "apple");
+
 
             //apple.centroid = player.model.position;
             //mat4.rotateY(apple.model.rotation, apple.model.rotation, 0.3 * deltaTime);
