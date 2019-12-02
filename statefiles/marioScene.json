@@ -52,7 +52,7 @@
             "name" : "platform0",
             "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.1, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
             "type": "cube",
-            "texture": "./materials/floortile_hd.png",
+            "texture": "./materials/testing.png",
             "parent" : null,
             "position": [0.0, 0.0, 0.0],
             "scale": [1.0, 1.0, 1.0]
