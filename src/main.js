@@ -205,6 +205,7 @@ function main() {
         isFirstPerson: false,
         jump: 0,
         swole: false,
+        invincible: 0,
         bounce: 0,
         bounceLeft: 0,
         bounceRight: 0,
@@ -394,12 +395,6 @@ function startRendering(gl, state, platforms, enemies) {
                 player.model.position[1] += 0.15;    //y value incease per tick - jump speed
             }
 
-/*  Collision - omni, require variable name changes - hitbox required? 
- if (player.model.position[2] < platform1.model.position[2] + 2.5 && //2.5 = half scale
-                player.model.position[2] > platform1.model.position[2] &&
-                player.model.position[1] < platform1.model.position[1] + 0.5 &&
-                player.model.position[1] > platform1.model.position[1]) {
-*/
 /*
 for all objects
     if object.centroid is within a certain radius of player.position
@@ -416,9 +411,12 @@ if player z value in a particular segment
             //console.log(player.model.position[1], platforms[1].model.position[1]);
 
 
-            //GRAVITY - can later adapt this to pit-checker
-            if ((player.model.position[1] > -2.5)){
+            //pit-checker
+            if ((player.model.position[1] < -2.5)){
+                alert("Game over");
+                document.location.reload();
 
+}
                 state.collision = 0;
                 //collision testing - for platforms, can use "x".scale * 2 to find length
                 for(let i = 0; i < platforms.length; i++){
@@ -457,18 +455,27 @@ if player z value in a particular segment
                 //if bouncing left
                 if (state.bounceLeft){
                     //continue bounce, reduce counter
-                    player.model.position[2] -= 0.1;
+                    player.model.position[2] -= 0.15;
                     state.bounceLeft--;
                 }
 
                 //if bouncing right
                 if (state.bounceRight){
                     //continue bounce, reduce counter
-                    player.model.position[2] += 0.1;
+                    player.model.position[2] += 0.15;
                     state.bounceRight--;
                 }
 
-                //apple nom test
+                //if invincible
+                if (state.invincible){
+                    //tick down towards wearing off
+                    if(state.invincible === 1){
+                        player.material.diffuse = vec3.fromValues(0.2, 0.2, 0.2);
+                    }
+                    state.invincible--;
+                }
+
+                //apple nom
                 if(Math.abs(player.model.position[2] - apple.model.position[2]) < 0.5){
                         if(Math.abs((player.model.position[1] + 0.25) - apple.model.position[1]) < 0.2){
                             player.model.scale[1] *= 1.5;
@@ -478,23 +485,28 @@ if player z value in a particular segment
                         }
                     }
 
-                //console.log(state.previous[1], player.model.position[1]);
-                //enemy collision test
+                //enemy collision
                 for (let i = 0; i < enemies.length; i++){
                     if (player.model.position[2] <= enemies[i].position[2] + 0.5 && //2.5 = half scale
                     player.model.position[2] >= enemies[i].position[2] - 0.5 &&
                     player.model.position[1] <= enemies[i].position[1] + 0.5 &&
                     player.model.position[1] + 0.85 >= enemies[i].position[1]) {
-                        console.log(enemies[i].name);
-                        if (state.previous[1] > player.model.position[1] + 0.01){
+                        //console.log(enemies[i].name);
+                        if (state.previous[1] > player.model.position[1] + 0.01){ //if player is colliding from above
                             console.log("squish");
                             state.bounce = 20;
                         } else {
-                            console.log(state.swole);
                             if (state.swole){
                                 state.swole = false;
                                 player.model.scale[1] *= 0.75;
                                 player.model.scale[2] *= 0.75;
+                                state.invincible = 50;
+                                player.material.diffuse = vec3.fromValues(0.8, 0.8, 0.8);
+                            } else {
+                                if (!state.invincible){
+                                    alert("Game over");
+                                    document.location.reload();
+                                }
                             }
 
                         }
@@ -567,7 +579,6 @@ if player z value in a particular segment
                         //beat level
 
                 }
-            }
 
             //toggle view to first person
             if (state.keyboard["c"]) {
