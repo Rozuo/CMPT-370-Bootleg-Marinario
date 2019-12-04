@@ -500,7 +500,7 @@ if player z value in a particular segment
                                 state.swole = false;
                                 player.model.scale[1] *= 0.75;
                                 player.model.scale[2] *= 0.75;
-                                state.invincible = 50;
+                                state.invincible = 100;
                                 player.material.diffuse = vec3.fromValues(0.8, 0.8, 0.8);
                             } else {
                                 if (!state.invincible){

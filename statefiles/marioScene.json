@@ -39,7 +39,7 @@
             "model" : "./models/koopaBod.obj",
             "role" : "enemy",
             "parent" : null,
-            "position": [1.0, 0.0, -8.0],
+            "position": [1.0, 0.0, -18.0],
             "scale": [0.25, 0.25, 0.25]
         },
         {
@@ -49,7 +49,7 @@
             "model" : "./models/koopaAppendages.obj",
             "role" : "enemy",
             "parent" : null,
-            "position": [1.0, 0, -8.0],
+            "position": [1.0, 0, -18.0],
             "scale": [0.25, 0.25, 0.25]
         },
         {
@@ -116,7 +116,7 @@
             "name" : "platform6",
             "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.1, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
             "type": "cube",
-            "texture": "./materials/plywood.jpg",
+            
             "role" : "platform",
             "parent" : null,
             "position": [0.0, 8.5, 80.0],
@@ -136,7 +136,7 @@
             "name" : "platform8",
             "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.1, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
             "type": "cube",
-            "texture": "./materials/plywood.jpg",
+            
             "role" : "platform",
             "parent" : null,
             "position": [0.0, 8.5, 71.0],
