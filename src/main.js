@@ -204,6 +204,10 @@ function main() {
 
         isFirstPerson: false,
         jump: 0,
+        swole: false,
+        bounce: 0,
+        bounceLeft: 0,
+        bounceRight: 0,
         collision: 0,
         previous: vec3.fromValues(0.0, 0.0, 0.25),
         camera: {
@@ -249,23 +253,38 @@ function main() {
         }
     })
 
+
+    //felt cute might delete later and use the role tags to differentiate collision
+
+    //populate array of platforms
     var platforms = [];
-    //populate array with platforms
+
     //iterate through object list
     for (let i = 0; i < state.objectCount; i++){
-        if (state.objects[i].name.substring(0, 8) === "platform"){
+        if (state.objects[i].name.substring(0, 8) === "platform"){  //add all items with platform in their name to the list
             platforms.push(state.objects[i]);
         }
     }
 
-    console.log(platforms);
+    //do the same for enemies
+    var enemies = [];
+
+    for (let i = 0; i < state.level.objects.length; i++){
+        //console.log(state.level.objects[i]);
+        if (state.level.objects[i].role === "enemy"){     //add all enemies to the list
+            enemies.push(state.level.objects[i]);
+        }
+    } 
+    console.log(enemies);
+
+
 
     //setup mouse click listener
     /*
     canvas.addEventListener('click', (event) => {
         getMousePick(event, state);
     }) */
-    startRendering(gl, state, platforms);
+    startRendering(gl, state, platforms, enemies);
 
 }
 
@@ -295,7 +314,7 @@ function addObjectToScene(state, object) {
  * @param {object - object containing scene values} state 
  * @purpose - Calls the drawscene per frame
  */
-function startRendering(gl, state, platforms) {
+function startRendering(gl, state, platforms, enemies) {
     // A variable for keeping track of time between frames
     var then = 0.0;
 
@@ -310,6 +329,7 @@ function startRendering(gl, state, platforms) {
 
         let player = getObject(state, "marinario");
         let apple = getObject(state, "apple");
+        let goomba = getObject(state, "goomba");
 
 
 
@@ -396,8 +416,8 @@ if player z value in a particular segment
             //console.log(player.model.position[1], platforms[1].model.position[1]);
 
 
-            //GRAVITY - can later adapt loop to pit-checker
-            if ((player.model.position[1] > -0.5)){
+            //GRAVITY - can later adapt this to pit-checker
+            if ((player.model.position[1] > -2.5)){
 
                 state.collision = 0;
                 //collision testing - for platforms, can use "x".scale * 2 to find length
@@ -406,7 +426,14 @@ if player z value in a particular segment
                     player.model.position[2] >= platforms[i].model.position[2] &&
                     player.model.position[1] <= platforms[i].model.position[1] + 0.5 &&
                     player.model.position[1] + 0.85 >= platforms[i].model.position[1]) {
+                        
                         state.collision = 1;
+                        
+                        //if stuck in a platform, topside, move to top surface
+                        if(Math.abs(player.model.position[1] - (platforms[i].model.position[1] + 0.5)) <
+                         Math.abs(player.model.position[1] - platforms[i].model.position[1])){
+                            //player.model.position[1] = platforms[i].model.position[1] + 0.65;
+                        }
                         var collisionIndex = i;
                 }
 
@@ -415,6 +442,62 @@ if player z value in a particular segment
                 if (!state.collision){
                     if (!state.jump){
                         player.model.position[1] -= 0.15;   //fall value per tick
+
+                    }
+                }
+
+                //if bouncing
+                if (state.bounce){
+                    //continue bounce sequence
+                    player.model.position[1] += 0.3;
+                    //decrement bounce counter
+                    state.bounce--;
+                }
+
+                //if bouncing left
+                if (state.bounceLeft){
+                    //continue bounce, reduce counter
+                    player.model.position[2] -= 0.1;
+                    state.bounceLeft--;
+                }
+
+                //if bouncing right
+                if (state.bounceRight){
+                    //continue bounce, reduce counter
+                    player.model.position[2] += 0.1;
+                    state.bounceRight--;
+                }
+
+                //apple nom test
+                if(Math.abs(player.model.position[2] - apple.model.position[2]) < 0.5){
+                        if(Math.abs((player.model.position[1] + 0.25) - apple.model.position[1]) < 0.2){
+                            player.model.scale[1] *= 1.5;
+                            player.model.scale[2] *= 1.5;
+                            state.swole = true;
+                            apple.model.position = vec3.fromValues(0.0, -4.0, -2.0);                                
+                        }
+                    }
+
+                //console.log(state.previous[1], player.model.position[1]);
+                //enemy collision test
+                for (let i = 0; i < enemies.length; i++){
+                    if (player.model.position[2] <= enemies[i].position[2] + 0.5 && //2.5 = half scale
+                    player.model.position[2] >= enemies[i].position[2] - 0.5 &&
+                    player.model.position[1] <= enemies[i].position[1] + 0.5 &&
+                    player.model.position[1] + 0.85 >= enemies[i].position[1]) {
+                        console.log(enemies[i].name);
+                        if (state.previous[1] > player.model.position[1] + 0.01){
+                            console.log("squish");
+                            state.bounce = 20;
+                        } else {
+                            console.log(state.swole);
+                            if (state.swole){
+                                state.swole = false;
+                                player.model.scale[1] *= 0.75;
+                                player.model.scale[2] *= 0.75;
+                            }
+
+                        }
 
                     }
                 }
@@ -444,38 +527,44 @@ if player z value in a particular segment
 
                     }
 
-                    if(Math.abs(player.model.position[2] - apple.model.position[2]) < 0.5){
-                        if(Math.abs((player.model.position[1] + 0.25) - apple.model.position[1]) < 0.2){
-                            player.model.scale[1] *= 1.5;
-                            player.model.scale[2] *= 1.5;
-                            apple.model.position = vec3.fromValues(0.0, 0.0, -2.0);                                
-                        }
-                    }
                     
                     //if player was moving right (compare with object)
                     if (state.previous[2] < platforms[collisionIndex].model.position[2]){
                         player.model.position[2] -= 0.2;
-                        //state.keyboard["d"] = false;
+                        //consider temp disable of movement key in that direction
+                            //state.keyboard["d"] = false;
+                            //could also implement check in the "d-key" press check
+                        //begin bounce-off sequence
+                        state.bounceLeft = 15;
                         console.log("wham");
                     }
 
                     if (state.previous[2] > platforms[collisionIndex].model.position[2] + platforms[collisionIndex].model.scale[2] /2 ){
                         player.model.position[2] += 0.2;
-                        //state.keyboard["d"] = false;
+                        //consider temp disable of movement key in that direction
+                            //state.keyboard["a"] = false;
+                        //begin bounce-off sequence
+                        state.bounceRight = 15;
                         console.log("bam");
                     }
 
-                    //separate collision tests:        
+                    //other collision events:        
                         
-                        //if enemy
+                    //if enemy
+                        //from top:
+                            //squish + bounce
+                        //from side:
+                            //test overlap and determine if there is more overlap on side or from top
                             //if player big
                                 //player becomes small
                             //if player small
                                 //lose
-                        //if mushroom
-                            //get swole
-                                //player.model.scale[1] *= 1.5;
-                                //player.model.scale[2] *= 1.5;
+                    //if mushroom
+                        //get swole
+                            //player.model.scale[1] *= 1.5;
+                            //player.model.scale[2] *= 1.5;
+                    //if exit
+                        //beat level
 
                 }
             }
@@ -485,8 +574,8 @@ if player z value in a particular segment
 
                 state.isFirstPerson = true;
                 state.camera.position[0] = player.model.position[0];        //center of player
-                state.camera.position[1] = player.model.position[1] + 0.75;    //top of player
-                state.camera.position[2] = player.model.position[2] + 0.1;  //front of player
+                state.camera.position[1] = player.model.position[1] + 0.80;    //top of player
+                state.camera.position[2] = player.model.position[2] + 0.2;  //front of player
 
                 //looking in front of player
                 state.camera.center = vec3.fromValues(player.model.position[0] + 0.25, 
