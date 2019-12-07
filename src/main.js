@@ -276,16 +276,21 @@ function main() {
             enemies.push(state.level.objects[i]);
         }
     } 
-    console.log(enemies);
 
 
+    //variable for keeping track of time elapsed
+    var d = new Date();
+    console.log(d.getTime());
 
-    //setup mouse click listener
+    let exit = getObject(state, "exit");
+
+    //setup mouse click listener                
     /*
     canvas.addEventListener('click', (event) => {
         getMousePick(event, state);
     }) */
-    startRendering(gl, state, platforms, enemies);
+
+    startRendering(gl, state, platforms, enemies, exit);
 
 }
 
@@ -315,7 +320,7 @@ function addObjectToScene(state, object) {
  * @param {object - object containing scene values} state 
  * @purpose - Calls the drawscene per frame
  */
-function startRendering(gl, state, platforms, enemies) {
+function startRendering(gl, state, platforms, enemies, exit) {
     // A variable for keeping track of time between frames
     var then = 0.0;
 
@@ -330,8 +335,6 @@ function startRendering(gl, state, platforms, enemies) {
 
         let player = getObject(state, "marinario");
         let apple = getObject(state, "apple");
-        let goomba = getObject(state, "goomba");
-
 
 
         //wait until the scene is completely loaded to render it
@@ -357,11 +360,15 @@ function startRendering(gl, state, platforms, enemies) {
             if (state.keyboard["a"]) {
                 //forward while in "2d" view
                 //TODO: direction facing tag, rotate object to face walking direction
-                vec3.add(player.model.position, player.model.position, vec3.fromValues(0.0, 0.0, -0.2));
+                if(!state.bounceRight){
+                    vec3.add(player.model.position, player.model.position, vec3.fromValues(0.0, 0.0, -0.2));
+                }
             }
             if (state.keyboard["d"]) {
                 //backwards while in "2d" view
-                vec3.add(player.model.position, player.model.position, vec3.fromValues(0.0, 0.0, 0.2));
+                if(!state.bounceLeft){
+                    vec3.add(player.model.position, player.model.position, vec3.fromValues(0.0, 0.0, 0.2));
+                }
             }
             //FREE CAMERA - requires disabling of camera toggle modes - for debug
             if (state.keyboard["W"]) {
@@ -385,12 +392,10 @@ function startRendering(gl, state, platforms, enemies) {
                 moveRight(state);
             }
 
-            
 
             //JUMP!
             if (state.jump > 0){
                 //console.log("jumpu");
-                //console.log(player);
                 state.jump--;   //decrease jump tick counter - see myGame.js for count
                 player.model.position[1] += 0.15;    //y value incease per tick - jump speed
             }
@@ -408,177 +413,174 @@ if player z value in a particular segment
 
 */
 
-            //console.log(player.model.position[1], platforms[1].model.position[1]);
-
-
             //pit-checker
             if ((player.model.position[1] < -2.5)){
+                for(let i = 0; i < state.keyboard.length; i++){
+                    state.keyboard[i] = false;
+                }
                 alert("Game over");
                 document.location.reload();
+                }
 
-}
-                state.collision = 0;
-                //collision testing - for platforms, can use "x".scale * 2 to find length
-                for(let i = 0; i < platforms.length; i++){
-                    if (player.model.position[2] <= platforms[i].model.position[2] + (platforms[i].model.scale[2] /2) && //2.5 = half scale
-                    player.model.position[2] >= platforms[i].model.position[2] &&
-                    player.model.position[1] <= platforms[i].model.position[1] + 0.5 &&
-                    player.model.position[1] + 0.85 >= platforms[i].model.position[1]) {
+            //exit-checker - set the z value check to whatever position the end-of-level flag is
+            //player position > exitflag.positon, etc
+            if ((player.model.position[2] > exit.model.position[2])){
+                //whatever kind of behaviour we want for the finish
+                alert("Level Clear!");
+                document.location.reload();
+                }
+
+            state.collision = 0;
+            //collision testing - for platforms, can use "x".scale * 2 to find length
+            for(let i = 0; i < platforms.length; i++){
+                if (player.model.position[2] <= platforms[i].model.position[2] + (platforms[i].model.scale[2] /2) && //2.5 = half scale
+                player.model.position[2] >= platforms[i].model.position[2] &&
+                player.model.position[1] <= platforms[i].model.position[1] + 0.5 &&
+                player.model.position[1] + 0.85 >= platforms[i].model.position[1]) {
+                    state.collision = 1;
                         
-                        state.collision = 1;
-                        
-                        //if stuck in a platform, topside, move to top surface
-                        if(Math.abs(player.model.position[1] - (platforms[i].model.position[1] + 0.5)) <
-                         Math.abs(player.model.position[1] - platforms[i].model.position[1])){
+                    //if stuck in a platform, topside, move to top surface
+                    if(Math.abs(player.model.position[1] - (platforms[i].model.position[1] + 0.5)) <
+                        Math.abs(player.model.position[1] - platforms[i].model.position[1])){
                             //player.model.position[1] = platforms[i].model.position[1] + 0.65;
-                        }
+                                //currently bugs out apple hitbox
+                    }
                         var collisionIndex = i;
                 }
 
             }
-                //if no collision and not jumping, fall
-                if (!state.collision){
-                    if (!state.jump){
-                        player.model.position[1] -= 0.15;   //fall value per tick
+                
+            //if no collision and not jumping, fall
+            if (!state.collision){
+                if (!state.jump){
+                    player.model.position[1] -= 0.15;   //fall value per tick
 
-                    }
                 }
+            }
 
                 //if bouncing
-                if (state.bounce){
-                    //continue bounce sequence
-                    player.model.position[1] += 0.3;
-                    //decrement bounce counter
-                    state.bounce--;
-                }
+            if (state.bounce){
+                //continue bounce sequence
+                player.model.position[1] += 0.3;
+                //decrement bounce counter
+                state.bounce--;
+            }
 
-                //if bouncing left
-                if (state.bounceLeft){
-                    //continue bounce, reduce counter
-                    player.model.position[2] -= 0.15;
-                    state.bounceLeft--;
-                }
+            //if bouncing left
+            if (state.bounceLeft){
+                //continue bounce, reduce counter
+                player.model.position[2] -= 0.15;
+                state.bounceLeft--;
+            }
 
-                //if bouncing right
-                if (state.bounceRight){
-                    //continue bounce, reduce counter
-                    player.model.position[2] += 0.15;
-                    state.bounceRight--;
-                }
+            //if bouncing right
+            if (state.bounceRight){
+                //continue bounce, reduce counter
+                player.model.position[2] += 0.15;
+                state.bounceRight--;
+            }
 
-                //if invincible
-                if (state.invincible){
-                    //tick down towards wearing off
-                    if(state.invincible === 1){
-                        player.material.diffuse = vec3.fromValues(0.2, 0.2, 0.2);
+            //if invincible
+            if (state.invincible){
+                //tick down towards wearing off
+                if(state.invincible === 1){
+                    player.material.diffuse = vec3.fromValues(0.2, 0.2, 0.2);
+                }
+                state.invincible--;
+            }
+
+            //apple nom
+            if(Math.abs(player.model.position[2] - apple.model.position[2]) < 0.5){
+                    if(Math.abs((player.model.position[1] + 0.25) - apple.model.position[1]) < 0.2){
+                        player.model.scale[1] *= 1.5;
+                        player.model.scale[2] *= 1.5;
+                        state.swole = true;
+                        apple.model.position = vec3.fromValues(0.0, -4.0, -2.0);                                
                     }
-                    state.invincible--;
                 }
 
-                //apple nom
-                if(Math.abs(player.model.position[2] - apple.model.position[2]) < 0.5){
-                        if(Math.abs((player.model.position[1] + 0.25) - apple.model.position[1]) < 0.2){
-                            player.model.scale[1] *= 1.5;
-                            player.model.scale[2] *= 1.5;
-                            state.swole = true;
-                            apple.model.position = vec3.fromValues(0.0, -4.0, -2.0);                                
-                        }
-                    }
-
-                //enemy collision
-                for (let i = 0; i < enemies.length; i++){
-                    if (player.model.position[2] <= enemies[i].position[2] + 0.5 && //2.5 = half scale
-                    player.model.position[2] >= enemies[i].position[2] - 0.5 &&
-                    player.model.position[1] <= enemies[i].position[1] + 0.5 &&
-                    player.model.position[1] + 0.85 >= enemies[i].position[1]) {
-                        //console.log(enemies[i].name);
-                        if (state.previous[1] > player.model.position[1] + 0.01){ //if player is colliding from above
-                            console.log("squish");
-                            state.bounce = 20;
+            //enemy collision
+            for (let i = 0; i < enemies.length; i++){
+                if (player.model.position[2] <= enemies[i].position[2] + 0.5 && //2.5 = half scale
+                player.model.position[2] >= enemies[i].position[2] - 0.5 &&
+                player.model.position[1] <= enemies[i].position[1] + 0.5 &&
+                player.model.position[1] + 0.85 >= enemies[i].position[1]) {
+                    //console.log(enemies[i].name);
+                    if (state.previous[1] > player.model.position[1] + 0.01){ //if player is colliding from above
+                        console.log("squish");
+                        state.bounce = 20;
+                    } else {
+                        if (state.swole){
+                            state.swole = false;
+                            player.model.scale[1] *= 0.75;
+                            player.model.scale[2] *= 0.75;
+                            state.invincible = 100;
+                            player.material.diffuse = vec3.fromValues(0.8, 0.8, 0.8);
                         } else {
-                            if (state.swole){
-                                state.swole = false;
-                                player.model.scale[1] *= 0.75;
-                                player.model.scale[2] *= 0.75;
-                                state.invincible = 100;
-                                player.material.diffuse = vec3.fromValues(0.8, 0.8, 0.8);
-                            } else {
-                                if (!state.invincible){
-                                    alert("Game over");
-                                    document.location.reload();
+                            if (!state.invincible){
+                                for(let i = 0; i < state.keyboard.length; i++){
+                                    state.keyboard[i] = false;
                                 }
+                                alert("Game over");
+                                state.invincible = 100;
+                                document.location.reload();
+
                             }
-
                         }
-
                     }
                 }
+            }
 
 
-                //if collision
-                if (state.collision){
-                    //console.log(collision)
-                    //if player above
-                        //if object is an enemy
-                            //boom
+            //platform collision
+            if (state.collision){
 
-                    //if player was moving up
-                    if (state.previous[1] < player.model.position[1]){
-                        //headbonk, stop jump
-                        state.jump = 0;
-                        console.log("bonk");
+                //if player was moving up
+                if (state.previous[1] < player.model.position[1]){
 
-                        //release apple
-                        if(Math.abs(player.model.position[2] - apple.model.position[2]) < 0.5){
-                            if(Math.abs(player.model.position[1] - apple.model.position[1]) < 1){
-                                apple.model.position[1] += 0.5;
-                            }
-                        }
-
-                        player.model.position[1] -= 0.15;   //move down slightly to get out of collision
-
+                    //if player collides from bottom
+                    if (Math.abs(player.model.position[2] - platforms[collisionIndex].model.position[2] >
+                        player.model.position[1] + 0.75 - platforms[collisionIndex].model.position[1]) ||
+                        Math.abs(player.model.position[2] - (platforms[collisionIndex].model.position[2] + (platforms[collisionIndex].model.scale/2)) <
+                        player.model.position[1] + 0.75 - platforms[collisionIndex].model.position[1])){
+                            //headbonk, stop jump
+                            state.jump = 0;
+                            console.log("bonk");
                     }
+
+
+                    //release apple from block
+                    if(Math.abs(player.model.position[2] - apple.model.position[2]) < 0.5){
+                        if(Math.abs(player.model.position[1] - apple.model.position[1]) < 1){
+                            apple.model.position[1] += 0.5;
+                        }
+                    }
+
+                    player.model.position[1] -= 0.15;   //move down slightly to get out of collision
+                }
 
                     
-                    //if player was moving right (compare with object)
-                    if (state.previous[2] < platforms[collisionIndex].model.position[2]){
-                        player.model.position[2] -= 0.2;
-                        //consider temp disable of movement key in that direction
-                            //state.keyboard["d"] = false;
-                            //could also implement check in the "d-key" press check
-                        //begin bounce-off sequence
-                        state.bounceLeft = 15;
-                        console.log("wham");
-                    }
-
-                    if (state.previous[2] > platforms[collisionIndex].model.position[2] + platforms[collisionIndex].model.scale[2] /2 ){
-                        player.model.position[2] += 0.2;
-                        //consider temp disable of movement key in that direction
-                            //state.keyboard["a"] = false;
-                        //begin bounce-off sequence
-                        state.bounceRight = 15;
-                        console.log("bam");
-                    }
-
-                    //other collision events:        
-                        
-                    //if enemy
-                        //from top:
-                            //squish + bounce
-                        //from side:
-                            //test overlap and determine if there is more overlap on side or from top
-                            //if player big
-                                //player becomes small
-                            //if player small
-                                //lose
-                    //if mushroom
-                        //get swole
-                            //player.model.scale[1] *= 1.5;
-                            //player.model.scale[2] *= 1.5;
-                    //if exit
-                        //beat level
-
+                //if player was moving right (compare with object)
+                if (state.previous[2] < platforms[collisionIndex].model.position[2]){
+                    player.model.position[2] -= 0.15;
+                    //consider temp disable of movement key in that direction
+                        //state.keyboard["d"] = false;
+                        //could also implement check in the "d-key" press check
+                    //begin bounce-off sequence
+                    state.bounceLeft = 15;
+                    console.log("right");
                 }
+
+                //if player was moving left
+                if (state.previous[2] > platforms[collisionIndex].model.position[2] + platforms[collisionIndex].model.scale[2] /2 ){
+                    player.model.position[2] += 0.15;
+                    //consider temp disable of movement key in that direction
+                        //state.keyboard["a"] = false;
+                    //begin bounce-off sequence
+                    state.bounceRight = 15;
+                    console.log("left");
+                }
+            }
 
             //toggle view to first person
             if (state.keyboard["c"]) {
@@ -604,21 +606,12 @@ if player z value in a particular segment
                 //looking straight on, slightly above player, at player z value
                 state.camera.center = vec3.fromValues(0, 5, player.model.position[2]);
             }
-            
-
-            //console.log(state.previous[2], player.model.position[2]);
 
             //Mouse-camera movement 0 debug
             if (state.mouse['camMove']) {
                 //vec3.rotateY(state.camera.center, state.camera.center, state.camera.position, (state.camera.yaw - 0.25) * deltaTime * state.mouse.sensitivity);
                 vec3.rotateY(state.camera.center, state.camera.center, state.camera.position, (-state.mouse.rateX * deltaTime * state.mouse.sensitivity));
             }
-
-
-
-            //apple.centroid = player.model.position;
-            //mat4.rotateY(apple.model.rotation, apple.model.rotation, 0.3 * deltaTime);
-
 
             // Draw our scene
             drawScene(gl, deltaTime, state);

@@ -9,11 +9,11 @@
             "role" : "object",
             "parent" : null,
             "position": [0.25, 3.25, 7.5],
-            "scale": [2.0, 2.0, 2.0]
+            "scale": [1.5, 1.5, 1.5]
         },
         {
             "name" : "marinario",
-            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.01, 0.01, 0.01], "specular": [0.8, 0.8, 0.8], "n":12, "alpha":1.0},
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.02, 0.02, 0.02], "specular": [0.8, 0.8, 0.8], "n":12, "alpha":1.0},
             "type": "mesh",
             "model" : "./models/mario.obj",
             "role" : "player",
@@ -24,13 +24,13 @@
         },
         {
             "name" : "goomba",
-            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.001, 0.001, 0.001], "specular": [0.8, 0.8, 0.8], "n":12, "alpha":1.0},
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.001, 0.01, 0.01], "specular": [0.8, 0.8, 0.8], "n":12, "alpha":1.0},
             "type": "mesh",
             "model" : "./models/goomba.obj",
             "role" : "enemy",
             "parent" : null,
             "position": [0.25, 0.5, 25.0],
-            "scale": [1.0, 1.0, 1.0]
+            "scale": [1.25, 1.25, 1.25]
         },
         {
             "name" : "koopaBod",
@@ -181,6 +181,15 @@
             "parent" : null,
             "position": [0.0, 7.0, 92.0],
             "scale": [1.0, 1.0, 50.0]
+        },
+        {
+            "name" : "exit",
+            "material" : {"diffuse" : [0.8, 0.2, 0.2], "ambient": [0.8, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
+            "type": "cube",
+            "role" : "exit",
+            "parent" : null,
+            "position": [0.0, 0.0, 145.0],
+            "scale": [1.0, 25.0, 1.0]
         },
         {
             "name": "light0",
