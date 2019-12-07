@@ -213,8 +213,8 @@ function main() {
         previous: vec3.fromValues(0.0, 0.0, 0.25),
         camera: {
             name: 'camera',
-            position: vec3.fromValues(-10.0, 4.0, 0.0),
-            center: vec3.fromValues(0.0, 4.0, 0.0),
+            position: vec3.fromValues(-10.0, 5.0, 0.0),
+            center: vec3.fromValues(0.0, 5.0, 0.0),
             up: vec3.fromValues(0.0, 1.0, 0.0),
             pitch: 0,
             yaw: 0,
@@ -254,10 +254,7 @@ function main() {
         }
     })
 
-
-    //felt cute might delete later and use the role tags to differentiate collision
-
-    //populate array of platforms
+    //populate array of platforms for collision checking
     var platforms = [];
 
     //iterate through object list
@@ -277,19 +274,21 @@ function main() {
         }
     } 
 
-
     //variable for keeping track of time elapsed
     var d = new Date();
     console.log(d.getTime());
 
+    //separate variabel for exit object
     let exit = getObject(state, "exit");
 
+    
     //setup mouse click listener                
     /*
     canvas.addEventListener('click', (event) => {
         getMousePick(event, state);
     }) */
 
+                            //pass collision lists to the render function
     startRendering(gl, state, platforms, enemies, exit);
 
 }
@@ -333,10 +332,9 @@ function startRendering(gl, state, platforms, enemies, exit) {
 
         state.deltaTime = deltaTime;
 
+        //initialize some objects that aren't passed to function
         let player = getObject(state, "marinario");
         let apple = getObject(state, "apple");
-
-        //enemyPatrol(getObject(state, "goomba"));
 
         //wait until the scene is completely loaded to render it
         if (state.numberOfObjectsToLoad <= state.objects.length) {
@@ -348,96 +346,94 @@ function startRendering(gl, state, platforms, enemies, exit) {
             //keeps track of player's position from last frame - for collision direction detection
             state.previous = vec3.fromValues(player.model.position[0], player.model.position[1], player.model.position[2]);
 
-            //PLAYER DIRECTION
-            if (state.keyboard["w"]) {
-                //forward, first person
-                vec3.add(player.model.position, player.model.position, vec3.fromValues(0.0, 0.0, 0.2));
+    //PLAYER CONTROLS
+            //POTENTIAL TODO: direction facing tag, rotate object to face walking direction
 
+            if (state.keyboard["w"]) {
+                //if in first person and not currently bouncing back
+                if (state.isFirstPerson && !state.bounceRight){
+                    //move forward
+                    vec3.add(player.model.position, player.model.position, vec3.fromValues(0.0, 0.0, 0.2));
+                }
             }
             if (state.keyboard["s"]) {
-                //backward, first person
-                vec3.add(player.model.position, player.model.position, vec3.fromValues(0.0, 0.0, -0.2));
+                //if in first person and not currently bouncing forward
+                if (state.isFirstPerson && !state.bounceRight){
+                    //move backward
+                    vec3.add(player.model.position, player.model.position, vec3.fromValues(0.0, 0.0, -0.2));
+                }
             }
             if (state.keyboard["a"]) {
-                //forward while in "2d" view
-                //TODO: direction facing tag, rotate object to face walking direction
-                if(!state.bounceRight){
+                //if in "2d" view and not currently bouncing right
+                if (!state.isFirstPerson && !state.bounceRight){
+                    //move left
                     vec3.add(player.model.position, player.model.position, vec3.fromValues(0.0, 0.0, -0.2));
                 }
             }
             if (state.keyboard["d"]) {
-                //backwards while in "2d" view
-                if(!state.bounceLeft){
+                //if in "2d" view and not currently bouncing left
+                if (!state.isFirstPerson && !state.bounceLeft){
+                    //move right
                     vec3.add(player.model.position, player.model.position, vec3.fromValues(0.0, 0.0, 0.2));
                 }
             }
-            //FREE CAMERA - requires disabling of camera toggle modes - for debug
-            if (state.keyboard["W"]) {
-                //camera (debug)
-                //moveForward(state);
-                
-                //player.model.scale[1]*=1.1;   //random scale test
-            }
-            if (state.keyboard["S"]) {
-                //camera (debug)
-                //moveBackward(state);
-                
-                //player.model.scale[1]*=0.9;   //random descale test
-            }
-            if (state.keyboard["A"]) {
-                //camera (debug)
-                moveLeft(state);
-            }
-            if (state.keyboard["D"]) {
-                //camera (debug)
-                moveRight(state);
-            }
-
 
             //JUMP!
             if (state.jump > 0){
                 //console.log("jumpu");
                 state.jump--;   //decrease jump tick counter - see myGame.js for count
-                player.model.position[1] += 0.15;    //y value incease per tick - jump speed
+                player.model.position[1] += 0.15;    //y value increase per tick - jump speed
             }
 
+    //PRELIMINARY COLLISIONS
             //pit-checker
             if ((player.model.position[1] < -2.5)){
                 for(let i = 0; i < state.keyboard.length; i++){
                     state.keyboard[i] = false;
                 }
+                //patchwork solution to prevent multiple alerts from playing
+                player.model.position[1] += 500;
+
+                //message user, reload game
                 alert("Game over");
                 document.location.reload();
                 }
 
-            //exit-checker - set the z value check to whatever position the end-of-level flag is
-            //player position > exitflag.positon, etc
-            if ((player.model.position[2] > exit.model.position[2])){
-                //whatever kind of behaviour we want for the finish can go here
+            //exit-checker - checks player's position z value vs. exit's position
+            if (Math.abs(player.model.position[2] - exit.model.position[2]) < 0.15){
+                //patchwork solution to prevent multiple alerts from playing
+                player.model.position[1] += 500;
+                player.model.position[2] += 1;
+
+                //message user, reload game
                 alert("Level Clear!");
                 document.location.reload();
                 }
 
+
+            //reset collision value before testing
             state.collision = 0;
-            //collision testing - for platforms, can use "x".scale / 2 to find length
+            //platform collisions, compares player position to each platform in array
             for(let i = 0; i < platforms.length; i++){
                 if (player.model.position[2] <= platforms[i].model.position[2] + (platforms[i].model.scale[2] /2) && //2.5 = half scale
                 player.model.position[2] >= platforms[i].model.position[2] &&
                 player.model.position[1] <= platforms[i].model.position[1] + 0.5 &&
-                player.model.position[1] + 0.85 >= platforms[i].model.position[1]) {
+                player.model.position[1] + 0.85 >= platforms[i].model.position[1]) {    //uses 0.85 as player height because of 0.15 move tick
+                    //mark that a collision happened
                     state.collision = 1;
-                        
-                    //if stuck in a platform, topside, move to top surface
+                    //variable to identify which platform was collided with
+                    var collisionIndex = i;
+
+                    //if stuck in a platform, move to top surface
                     if(Math.abs(player.model.position[1] - (platforms[i].model.position[1] + 0.5)) <
                         Math.abs(player.model.position[1] - platforms[i].model.position[1])){
                             //player.model.position[1] = platforms[i].model.position[1] + 0.65;
                                 //currently bugs out apple hitbox
                     }
-                        var collisionIndex = i;
                 }
-
             }
-               
+            
+    //EVENTS           
             //gravity 
             //if no collision and not jumping, fall
             if (!state.collision){
@@ -471,23 +467,27 @@ function startRendering(gl, state, platforms, enemies, exit) {
 
             //if invincible
             if (state.invincible){
-                //tick down towards wearing off
                 if(state.invincible === 1){
+                    //revert back to original appearance if invincibility is about to wear off
                     player.material.diffuse = vec3.fromValues(0.2, 0.2, 0.2);
                 }
+                //reduce counter
                 state.invincible--;
             }
 
             //apple nom
             if(Math.abs(player.model.position[2] - apple.model.position[2]) < 0.5){
-                    if(Math.abs((player.model.position[1] + 0.25) - apple.model.position[1]) < 0.2){
-                        player.model.scale[1] *= 1.5;
-                        player.model.scale[2] *= 1.5;
-                        state.swole = true;
-                        apple.model.position = vec3.fromValues(0.0, -4.0, -2.0);                                
-                    }
+                if(Math.abs((player.model.position[1] + 0.25) - apple.model.position[1]) < 0.2){
+                    //get swole
+                    player.model.scale[1] *= 1.5;
+                    player.model.scale[2] *= 1.5;
+                    state.swole = true;
+                    //"hide" apple
+                    apple.model.position = vec3.fromValues(0.0, -4.0, -2.0);                                
                 }
+            }
 
+    //ROLE-BASED COLLISION
             //enemy collision
             for (let i = 0; i < enemies.length; i++){
                 if (player.model.position[2] <= enemies[i].position[2] + 0.5 && //2.5 = half scale
@@ -566,13 +566,14 @@ function startRendering(gl, state, platforms, enemies, exit) {
                 }
             }
 
+    //VIEW CHANGE
             //toggle view to first person
             if (state.keyboard["c"]) {
-
                 state.isFirstPerson = true;
-                state.camera.position[0] = player.model.position[0];        //center of player
-                state.camera.position[1] = player.model.position[1] + 0.80;    //top of player
-                state.camera.position[2] = player.model.position[2] + 0.2;  //front of player
+
+                state.camera.position[0] = player.model.position[0];            //center of player
+                state.camera.position[1] = player.model.position[1] + 0.80;     //head height
+                state.camera.position[2] = player.model.position[2] + 0.2;      //front of player
 
                 //looking in front of player
                 state.camera.center = vec3.fromValues(player.model.position[0] + 0.25, 
@@ -583,9 +584,9 @@ function startRendering(gl, state, platforms, enemies, exit) {
             //return view to "mock 2d"
             if (!state.keyboard["c"]) {
                 state.isFirstPerson = false;
-                state.camera.position[0] = -10;     //at a distance, broad view
-                state.camera.position[1] = 5;       //positioned above player
-                state.camera.position[2] = player.model.position[2];    // = player z value
+                state.camera.position[0] = -10;                                 //at a distance, broad view
+                state.camera.position[1] = 5;                                   //positioned above player
+                state.camera.position[2] = player.model.position[2];            // = player z value
 
                 //looking straight on, slightly above player, at player z value
                 state.camera.center = vec3.fromValues(0, 5, player.model.position[2]);
@@ -597,11 +598,14 @@ function startRendering(gl, state, platforms, enemies, exit) {
                 vec3.rotateY(state.camera.center, state.camera.center, state.camera.position, (-state.mouse.rateX * deltaTime * state.mouse.sensitivity));
             }
 
+    //ENEMY MOVEMENT
             enemyPatrol(getObject(state, "goomba0"), 13, 23);
             enemyPatrol(getObject(state, "goomba1"), -15, -5);
 
             //enemyPatrol(getObject(state, "koopaBod"),-13, -23);
 
+
+    //Draw/Render calls
             // Draw our scene
             drawScene(gl, deltaTime, state);
         }
