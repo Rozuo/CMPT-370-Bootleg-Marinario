@@ -20,7 +20,7 @@ window.onload = () => {
  */
 function createMesh(mesh, object) {
     if (object.type === "mesh") {
-        let testModel = new Model(state.gl, object.name, mesh, object.parent, object.material.ambient, object.material.diffuse, object.material.specular, object.material.n, object.material.alpha, object.texture);
+        let testModel = new Model(state.gl, object.name, mesh, object.parent, object.enemy, object.material.ambient, object.material.diffuse, object.material.specular, object.material.n, object.material.alpha, object.texture);
         testModel.vertShader = state.vertShaderSample;
         testModel.fragShader = state.fragShaderSample;
         testModel.setup();
@@ -498,6 +498,7 @@ function startRendering(gl, state, platforms, enemies, exit) {
                     if (state.previous[1] > player.model.position[1] + 0.01){ //if player is colliding from above
                         console.log("squish");
                         state.bounce = 20;
+                        player.model.position[1] += 0.15;
                     } else {
                         if (state.swole){
                             state.swole = false;
@@ -596,7 +597,10 @@ function startRendering(gl, state, platforms, enemies, exit) {
                 vec3.rotateY(state.camera.center, state.camera.center, state.camera.position, (-state.mouse.rateX * deltaTime * state.mouse.sensitivity));
             }
 
+            enemyPatrol(getObject(state, "goomba0"), 13, 23);
+            enemyPatrol(getObject(state, "goomba1"), -15, -5);
 
+            //enemyPatrol(getObject(state, "koopaBod"),-13, -23);
 
             // Draw our scene
             drawScene(gl, deltaTime, state);
@@ -752,33 +756,26 @@ function drawScene(gl, deltaTime, state) {
     });
 }
 
-function enemyPatrol(obj){
+function enemyPatrol(obj, min, max){
     if(typeof obj == "undefined"){
         console.warn("WARNING: there is no objects in the state file");
     }
-    var maxRange = vec3.create();
-    var minRange = vec3.create();
-    var positiveDirection = vec3.fromValues(0.0, 0.0, 0.01);
+
+    var initialPosition = obj.model.position
+
+    var positiveDirection = vec3.fromValues(0.0, 0.0, 0.03);
     var fromWhichWay = true;
-    var negativeDirection = vec3.fromValues(0.0, 0.0, -0.01);
-    // if(obj.enemy){
-    //     vec3.add(maxRange, vec3.fromValues(0.0, 0.0, 2.0), obj.model.position);
-    //     vec3.subtract(minRange, vec3.fromValues(0.0, 0.0, 2.0), obj.model.position);
-    // }
-    // else{
-    //     return;
-    // }
-    //if(obj.role != "enemy"){
-        //console.log(obj);
+    var negativeDirection = vec3.fromValues(0.0, 0.0, -0.03);
+
+    if(obj.enemy != true){
         return;
-    //}
+    }
     
-    // vec3.add(obj.model.position, obj.model.position, direction);
-    if(obj.model.position[2] >= obj.maxRange[2]){
+    if(obj.model.position[2] >= max){
         vec3.add(obj.model.position, obj.model.position, negativeDirection);
         obj.fromWhichWay = false;
     }
-    else if(obj.model.position[2] <= obj.minRange[2]){
+    else if(obj.model.position[2] <= min){
         vec3.add(obj.model.position, obj.model.position, positiveDirection);
         obj.fromWhichWay = true;
     }

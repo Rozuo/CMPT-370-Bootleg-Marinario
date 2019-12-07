@@ -23,7 +23,7 @@
             "scale": [0.5, 0.5, 0.5]
         },
         {
-            "name" : "goomba",
+            "name" : "goomba0",
             "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.001, 0.01, 0.01], "specular": [0.8, 0.8, 0.8], "n":12, "alpha":1.0},
             "type": "mesh",
             "model" : "./models/goomba.obj",
@@ -34,13 +34,24 @@
             "scale": [1.25, 1.25, 1.25]
         },
         {
+            "name" : "goomba1",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.001, 0.01, 0.01], "specular": [0.8, 0.8, 0.8], "n":12, "alpha":1.0},
+            "type": "mesh",
+            "model" : "./models/goomba.obj",
+            "enemy" : true,
+            "role" : "enemy",
+            "parent" : null,
+            "position": [0.25, 0.5, -10.0],
+            "scale": [1.25, 1.25, 1.25]
+        },
+        {
             "name" : "koopaBod",
             "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.001, 0.001, 0.001], "specular": [0.8, 0.8, 0.8], "n":12, "alpha":1.0},
             "type": "mesh",
             "model" : "./models/koopaBod.obj",
             "role" : "enemy",
             "parent" : null,
-            "position": [1.0, 0.0, -18.0],
+            "position": [0.25, 0.0, -18.0],
             "scale": [0.25, 0.25, 0.25]
         },
         {
@@ -50,7 +61,7 @@
             "model" : "./models/koopaAppendages.obj",
             "role" : "enemy",
             "parent" : null,
-            "position": [1.0, 0, -18.0],
+            "position": [0.25, 0.0, -18.0],
             "scale": [0.25, 0.25, 0.25]
         },
         {
