@@ -27,6 +27,7 @@
             "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.001, 0.01, 0.01], "specular": [0.8, 0.8, 0.8], "n":12, "alpha":1.0},
             "type": "mesh",
             "model" : "./models/goomba.obj",
+            "enemy" : true,
             "role" : "enemy",
             "parent" : null,
             "position": [0.25, 0.5, 25.0],

@@ -19,6 +19,14 @@ class Model {
         this.modelMatrix = mat4.create();
 
         this.lightingShader = this.lightingShader.bind(this);
+
+        if(this.enemy){
+            this.maxRange = vec3.create();
+            this.minRange = vec3.create();
+            vec3.add(this.maxRange, vec3.fromValues(0.0, 0.0, 2.0), this.model.position);
+            vec3.add(this.minRange, vec3.fromValues(0.0, 0.0, -2.0), this.model.position);
+        }
+        this.fromWhichWay = true;
     }
 
     scale(scaleVec) {

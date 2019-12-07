@@ -336,7 +336,7 @@ function startRendering(gl, state, platforms, enemies, exit) {
         let player = getObject(state, "marinario");
         let apple = getObject(state, "apple");
 
-        //enemyPatrol(getObject(state, "goomba"));
+        
 
         //wait until the scene is completely loaded to render it
         if (state.numberOfObjectsToLoad <= state.objects.length) {
@@ -596,6 +596,9 @@ function startRendering(gl, state, platforms, enemies, exit) {
                 vec3.rotateY(state.camera.center, state.camera.center, state.camera.position, (-state.mouse.rateX * deltaTime * state.mouse.sensitivity));
             }
 
+
+            enemyPatrol(getObject(state, "goomba"));
+
             // Draw our scene
             drawScene(gl, deltaTime, state);
         }
@@ -766,10 +769,10 @@ function enemyPatrol(obj){
     // else{
     //     return;
     // }
-    //if(obj.role != "enemy"){
+    if(obj.enemy != true){
         //console.log(obj);
         return;
-    //}
+    }
     
     // vec3.add(obj.model.position, obj.model.position, direction);
     if(obj.model.position[2] >= obj.maxRange[2]){
