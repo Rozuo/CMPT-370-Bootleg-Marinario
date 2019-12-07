@@ -400,19 +400,6 @@ function startRendering(gl, state, platforms, enemies, exit) {
                 player.model.position[1] += 0.15;    //y value incease per tick - jump speed
             }
 
-/*
-for all objects
-    if object.centroid is within a certain radius of player.position
-        check collision
-
-OR
-
-if player z value in a particular segment
-    for all objects in segment
-        check collision
-
-*/
-
             //pit-checker
             if ((player.model.position[1] < -2.5)){
                 for(let i = 0; i < state.keyboard.length; i++){
@@ -425,13 +412,13 @@ if player z value in a particular segment
             //exit-checker - set the z value check to whatever position the end-of-level flag is
             //player position > exitflag.positon, etc
             if ((player.model.position[2] > exit.model.position[2])){
-                //whatever kind of behaviour we want for the finish
+                //whatever kind of behaviour we want for the finish can go here
                 alert("Level Clear!");
                 document.location.reload();
                 }
 
             state.collision = 0;
-            //collision testing - for platforms, can use "x".scale * 2 to find length
+            //collision testing - for platforms, can use "x".scale / 2 to find length
             for(let i = 0; i < platforms.length; i++){
                 if (player.model.position[2] <= platforms[i].model.position[2] + (platforms[i].model.scale[2] /2) && //2.5 = half scale
                 player.model.position[2] >= platforms[i].model.position[2] &&
@@ -449,7 +436,8 @@ if player z value in a particular segment
                 }
 
             }
-                
+               
+            //gravity 
             //if no collision and not jumping, fall
             if (!state.collision){
                 if (!state.jump){
@@ -458,7 +446,7 @@ if player z value in a particular segment
                 }
             }
 
-                //if bouncing
+            //if bouncing up
             if (state.bounce){
                 //continue bounce sequence
                 player.model.position[1] += 0.3;
@@ -555,7 +543,6 @@ if player z value in a particular segment
                             apple.model.position[1] += 0.5;
                         }
                     }
-
                     player.model.position[1] -= 0.15;   //move down slightly to get out of collision
                 }
 
@@ -563,9 +550,6 @@ if player z value in a particular segment
                 //if player was moving right (compare with object)
                 if (state.previous[2] < platforms[collisionIndex].model.position[2]){
                     player.model.position[2] -= 0.15;
-                    //consider temp disable of movement key in that direction
-                        //state.keyboard["d"] = false;
-                        //could also implement check in the "d-key" press check
                     //begin bounce-off sequence
                     state.bounceLeft = 15;
                     console.log("right");
@@ -574,8 +558,6 @@ if player z value in a particular segment
                 //if player was moving left
                 if (state.previous[2] > platforms[collisionIndex].model.position[2] + platforms[collisionIndex].model.scale[2] /2 ){
                     player.model.position[2] += 0.15;
-                    //consider temp disable of movement key in that direction
-                        //state.keyboard["a"] = false;
                     //begin bounce-off sequence
                     state.bounceRight = 15;
                     console.log("left");
@@ -765,4 +747,43 @@ function drawScene(gl, deltaTime, state) {
             }
         }
     });
+}
+
+function enemyPatrol(obj){
+    if(typeof obj == "undefined"){
+        console.warn("WARNING: there is no objects in the state file");
+    }
+    var maxRange = vec3.create();
+    var minRange = vec3.create();
+    var positiveDirection = vec3.fromValues(0.0, 0.0, 0.01);
+    var fromWhichWay = true;
+    var negativeDirection = vec3.fromValues(0.0, 0.0, -0.01);
+    // if(obj.enemy){
+    //     vec3.add(maxRange, vec3.fromValues(0.0, 0.0, 2.0), obj.model.position);
+    //     vec3.subtract(minRange, vec3.fromValues(0.0, 0.0, 2.0), obj.model.position);
+    // }
+    // else{
+    //     return;
+    // }
+    if(obj.role != "enemy"){
+        return;
+    }
+    
+    // vec3.add(obj.model.position, obj.model.position, direction);
+    if(obj.model.position[2] >= obj.maxRange[2]){
+        vec3.add(obj.model.position, obj.model.position, negativeDirection);
+        obj.fromWhichWay = false;
+    }
+    else if(obj.model.position[2] <= obj.minRange[2]){
+        vec3.add(obj.model.position, obj.model.position, positiveDirection);
+        obj.fromWhichWay = true;
+    }
+    else{
+        if(obj.fromWhichWay == true){
+            vec3.add(obj.model.position, obj.model.position, positiveDirection);
+        }
+        else{
+            vec3.add(obj.model.position, obj.model.position, negativeDirection);
+        }
+    }
 }
