@@ -756,6 +756,13 @@ function drawScene(gl, deltaTime, state) {
     });
 }
 
+/**
+ *  This function is to calculate and constantly translate the enemies obj in either left or right directions
+ * @param {object} obj 
+ * @param {float} min 
+ * @param {float} max 
+ */
+
 function enemyPatrol(obj, min, max){
     if(typeof obj == "undefined"){
         console.warn("WARNING: there is no objects in the state file");
@@ -767,6 +774,7 @@ function enemyPatrol(obj, min, max){
     var fromWhichWay = true;
     var negativeDirection = vec3.fromValues(0.0, 0.0, -0.03);
 
+    // if we did not put in an enemy obj we leave
     if(obj.enemy != true){
         return;
     }
