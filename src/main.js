@@ -3,6 +3,9 @@ var state = {};
 // mario model from https://sketchfab.com/3d-models/rigged-mario-free-099c5106369e4e7db70876c320e9a634
 // koopa model from https://www.turbosquid.com/FullPreview/Index.cfm/ID/1301668
 // goomba model from https://www.turbosquid.com/FullPreview/Index.cfm/ID/1292471
+// question mark block texture: https://nintendo.fandom.com/wiki/%3F_Block
+// question mark block model: https://sketchfab.com/3d-models/question-mark-block-super-mario-bros-be464a0b81384de79f49d38f5632c3f3
+
 
 //centroid attribute not needed? Might save time at load to remove if having performance issues
     //eg: it calculates centroid for objects with tens of thousands of verts
