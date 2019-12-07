@@ -344,8 +344,13 @@ function drawScene(gl, deltaTime, state) {
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.enable(gl.DEPTH_TEST); // Enable depth testing
     gl.depthFunc(gl.LEQUAL); // Near things obscure far things
-    gl.clearDepth(1.0); // Clear everything
+    
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.ONE_MINUS_CONSTANT_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    
+    gl.clearDepth(1.0); // Clear everything
+    
 
     let lightPositionArray = [], lightColourArray = [], lightStrengthArray = [];
 
@@ -358,12 +363,27 @@ function drawScene(gl, deltaTime, state) {
         lightStrengthArray.push(light.strength);
     }
 
-    state.objects.map((object) => {
-        if (object.loaded) {
+    // var sortedObjs = state.objects.sort((a,b) => {
+    //     return (vec3.distance(b.model.position, state.camera.position) - vec3.distance(a.model.position, state.camera.position));
+    // });
 
+    state.objects.map((object) => {
+    // sortedObjs.map((object)=> {
+        if (object.loaded) {
+            
             gl.useProgram(object.programInfo.program);
             {
-
+                if(object.material.alpha < 1.0){
+                    gl.depthMask(false);
+                    gl.enable(gl.BLEND);
+                    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+                }
+                else{
+                    gl.disable(gl.BLEND);
+                    gl.depthMask(true);
+                    gl.enable(gl.DEPTH_TEST);
+                    gl.depthFunc(gl.LEQUAL);
+                }
                 var projectionMatrix = mat4.create();
                 var fovy = 60.0 * Math.PI / 180.0; // Vertical field of view in radians
                 var aspect = state.canvas.clientWidth / state.canvas.clientHeight; // Aspect ratio of the canvas
@@ -496,8 +516,7 @@ function enemyPatrol(obj){
     if(obj.enemy != true){
         return;
     }
-    console.log(obj.maxRange);
-    console.log(obj.minRange);
+    
     // vec3.add(obj.model.position, obj.model.position, direction);
     if(obj.model.position[2] >= obj.maxRange[2]){
         vec3.add(obj.model.position, obj.model.position, negativeDirection);

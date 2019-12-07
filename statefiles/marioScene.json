@@ -53,6 +53,26 @@
             "scale": [1.0, 1.0, 1.0]
         },
         {
+            "name" : "questionBlock",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.001, 0.001, 0.001], "specular": [0.8, 0.8, 0.8], "n":12, "alpha":0.7},
+            "type": "mesh",
+            "model" : "./models/questionBox.obj",
+            "texture": "./materials/internal_ground_ao_texture.jpeg",
+            "parent" : null,
+            "position": [4.0, -1.0, 1.0],
+            "scale": [1.0, 1.0, 1.0]
+        },
+        {
+            "name" : "fakeQuestionBlock",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.1, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
+            "type": "cube",
+            "texture": "./materials/QuestionBlock.png",
+            "textureNorm": "./materials/checkerNorm.jpg",
+            "parent" : null,
+            "position": [6.0, -1.0, -2],
+            "scale": [1.0, 1.0, 1.0]
+        },
+        {
             "name" : "wall0",
             "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.1, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
             "type": "cube",
