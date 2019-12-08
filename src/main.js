@@ -258,12 +258,17 @@ function main() {
         }
     })
 
+
+
     //populate array of platforms for collision checking
     var platforms = [];
 
     //iterate through object list
     for (let i = 0; i < state.objectCount; i++){
         if (state.objects[i].name.substring(0, 8) === "platform"){  //add all items with platform in their name to the list
+            if(state.objects[i].name.substring(8, 9) === "Q"){
+                mat4.rotateZ(state.objects[i].model.rotation, state.objects[i].model.rotation, (90 * Math.PI/180));
+            }
             platforms.push(state.objects[i]);
         }
     }
