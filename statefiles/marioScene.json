@@ -52,16 +52,16 @@
             "name" : "platform0",
             "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.1, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
             "type": "cube",
-            "texture": "./materials/testing.png",
+            "texture": "./materials/floortile_hd.png",
             "parent" : null,
             "position": [0.0, 0.0, 0.0],
-            "scale": [1.0, 1.0, 1.0]
+            "scale": [2.0, 2.0, 4.0]
         },
         {
             "name" : "platform1",
             "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.1, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
             "type": "cube",
-            "texture": "./materials/floortile_hd.png",
+            "texture": "./materials/brickblock.png",
             "parent" : null,
             "position": [0.0, 3.0, 7.0],
             "scale": [1.0, 1.0, 5.0]
@@ -70,7 +70,7 @@
             "name" : "platform2",
             "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.1, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
             "type": "cube",
-            "texture": "./materials/plywood.jpg",
+            "texture": "./materials/question_block_hd.png",
             "parent" : null,
             "position": [0.0, 6.0, 10],
             "scale": [1.0, 1.0, 30.0]

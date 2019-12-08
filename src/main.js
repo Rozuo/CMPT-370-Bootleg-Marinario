@@ -9,9 +9,9 @@ window.onload = () => {
 }
 
 /**
- * 
- * @param {object - contains vertex, normal, uv information for the mesh to be made} mesh 
- * @param {object - the game object that will use the mesh information} object 
+ *
+ * @param {object - contains vertex, normal, uv information for the mesh to be made} mesh
+ * @param {object - the game object that will use the mesh information} object
  * @purpose - Helper function called as a callback function when the mesh is done loading for the object
  */
 function createMesh(mesh, object) {
@@ -40,10 +40,10 @@ function createMesh(mesh, object) {
 }
 
 /**
- * 
- * @param {string - type of object to be added to the scene} type 
- * @param {string - url of the model being added to the game} url 
- * @purpose **WIP** Adds a new object to the scene from using the gui to add said object 
+ *
+ * @param {string - type of object to be added to the scene} type
+ * @param {string - url of the model being added to the game} url
+ * @purpose **WIP** Adds a new object to the scene from using the gui to add said object
  */
 function addObject(type, url = null) {
     if (type === "Cube") {
@@ -84,7 +84,7 @@ function main() {
         uniform mat4 uViewMatrix;
         uniform mat4 uModelMatrix;
         uniform mat4 normalMatrix;
-        
+
         out vec3 oFragPosition;
         out vec3 oCameraPosition;
         out vec3 oNormal;
@@ -115,7 +115,7 @@ function main() {
         in vec3 normalInterp;
         in vec2 oUV;
         in vec3 oVertBitang;
-        
+
         uniform vec3 uCameraPosition;
         uniform int numLights;
         uniform vec3 diffuseVal;
@@ -130,7 +130,7 @@ function main() {
         uniform vec3 uLightPositions[MAX_LIGHTS];
         uniform vec3 uLightColours[MAX_LIGHTS];
         uniform float uLightStrengths[MAX_LIGHTS];
-     
+
         out vec4 fragColor;
 
         void main() {
@@ -181,7 +181,7 @@ function main() {
             } else {
                 fragColor = vec4(ambient + diffuse + specular, 1.0);
             }
-            
+
         }
         `;
 
@@ -222,6 +222,37 @@ function main() {
             let tempCube = new Cube(gl, object.name, object.parent, object.material.ambient, object.material.diffuse, object.material.specular, object.material.n, object.material.alpha, object.texture, object.textureNorm);
             tempCube.vertShader = vertShaderSample;
             tempCube.fragShader = fragShaderSample;
+
+            if (object.scale){//checks if scale exists
+              for (let i=0; i<tempCube.model.uvs.length; i+=2){//scales tempCube.model.uvs by the scale values in the json
+                if (i<8){//front uvs
+                  tempCube.model.uvs[i] *= object.scale[0];//x value
+                  tempCube.model.uvs[i+1] *= object.scale[1];//y value
+                }
+                else if (i<16){//back uvs
+                  tempCube.model.uvs[i] *= object.scale[0];//x value
+                  tempCube.model.uvs[i+1] *= object.scale[1];//y value
+                }
+                else if (i<24){//left uvs
+                  tempCube.model.uvs[i] *= object.scale[1];//y value
+                  tempCube.model.uvs[i+1] *= object.scale[2];//z value
+                }
+                else if (i<32){//right uvs
+                  tempCube.model.uvs[i] *= object.scale[1];//y value
+                  tempCube.model.uvs[i+1] *= object.scale[2];//z value
+                }
+                else if (i<40){//top uvs
+                  tempCube.model.uvs[i] *= object.scale[2];//z value
+                  tempCube.model.uvs[i+1] *= object.scale[0];//x value
+                }
+                else if (i<48){//bottom uvs
+                  tempCube.model.uvs[i] *= object.scale[2];//z value
+                  tempCube.model.uvs[i+1] *= object.scale[0];//x value
+                }
+              }
+            }
+            //console.log("tempcube uvs: "+tempCube.model.uvs);
+
             tempCube.setup();
             tempCube.model.position = vec3.fromValues(object.position[0], object.position[1], object.position[2]);
             if (object.scale) {
@@ -251,9 +282,9 @@ function main() {
 }
 
 /**
- * 
- * @param {object - object containing scene values} state 
- * @param {object - the object to be added to the scene} object 
+ *
+ * @param {object - object containing scene values} state
+ * @param {object - the object to be added to the scene} object
  * @purpose - Helper function for adding a new object to the scene and refreshing the GUI
  */
 function addObjectToScene(state, object) {
@@ -271,9 +302,9 @@ function addObjectToScene(state, object) {
 }
 
 /**
- * 
- * @param {gl context} gl 
- * @param {object - object containing scene values} state 
+ *
+ * @param {gl context} gl
+ * @param {object - object containing scene values} state
  * @purpose - Calls the drawscene per frame
  */
 function startRendering(gl, state) {
@@ -339,7 +370,7 @@ function startRendering(gl, state) {
                 state.camera.position[1] = player.model.position[1] + 1;    //top of player
                 state.camera.position[2] = player.model.position[2] + 0.5;
 
-                state.camera.center = vec3.fromValues(player.model.position[0] + 0.25, 
+                state.camera.center = vec3.fromValues(player.model.position[0] + 0.25,
                                                     player.model.position[1]+1,
                                                     player.model.position[2]+2);
             }
@@ -377,10 +408,10 @@ function startRendering(gl, state) {
 }
 
 /**
- * 
- * @param {gl context} gl 
- * @param {float - time from now-last} deltaTime 
- * @param {object - contains the state for the scene} state 
+ *
+ * @param {gl context} gl
+ * @param {float - time from now-last} deltaTime
+ * @param {object - contains the state for the scene} state
  * @purpose Iterate through game objects and render the objects aswell as update uniforms
  */
 function drawScene(gl, deltaTime, state) {
@@ -480,7 +511,7 @@ function drawScene(gl, deltaTime, state) {
                         gl.uniform1i(object.programInfo.uniformLocations.samplerExists, state.samplerExists);
                         gl.uniform1i(object.programInfo.uniformLocations.sampler, 0);
                         gl.bindTexture(gl.TEXTURE_2D, object.model.texture);
-                        
+
                     } else {
                         gl.activeTexture(gl.TEXTURE0);
                         state.samplerExists = 0;
