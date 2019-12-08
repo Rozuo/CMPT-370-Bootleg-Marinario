@@ -281,7 +281,7 @@ function main() {
     var d = new Date();
     console.log(d.getTime());
 
-    //separate variabel for exit object
+    //separate variable for exit object
     let exit = getObject(state, "exit");
 
     
@@ -483,7 +483,7 @@ function startRendering(gl, state, platforms, enemies, exit) {
                 if(Math.abs((player.model.position[1] + 0.25) - apple.model.position[1]) < 0.2){
                     //get swole
                     player.model.scale[1] *= 1.5;
-                    player.model.scale[2] *= 1.5;
+                    player.model.scale[2] *= 1.2;
                     state.swole = true;
                     //"hide" apple
                     apple.model.position = vec3.fromValues(0.0, -4.0, -2.0);                                
@@ -502,11 +502,12 @@ function startRendering(gl, state, platforms, enemies, exit) {
                         console.log("squish");
                         state.bounce = 20;
                         player.model.position[1] += 0.15;
+                        //enemies[i].position[1] -= 10; //quick fix to get enemy to disappear when hit
                     } else {
                         if (state.swole){
                             state.swole = false;
-                            player.model.scale[1] *= 0.75;
-                            player.model.scale[2] *= 0.75;
+                            player.model.scale[1] *= 0.66;
+                            player.model.scale[2] *= 0.84;
                             state.invincible = 100;
                             player.material.diffuse = vec3.fromValues(0.8, 0.8, 0.8);
                         } else {
@@ -603,7 +604,9 @@ function startRendering(gl, state, platforms, enemies, exit) {
 
     //ENEMY MOVEMENT
             enemyPatrol(getObject(state, "goomba0"), 13, 23);
-            enemyPatrol(getObject(state, "goomba1"), -15, -5);
+            enemyPatrol(getObject(state, "goomba1"), 30, 48);
+            enemyPatrol(getObject(state, "goomba2"), 55, 65);
+            enemyPatrol(getObject(state, "goomba3"), 100, 120);
 
             //enemyPatrol(getObject(state, "koopaBod"),-13, -23);
 

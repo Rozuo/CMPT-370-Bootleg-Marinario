@@ -41,7 +41,29 @@
             "enemy" : true,
             "role" : "enemy",
             "parent" : null,
-            "position": [0.25, 0.5, -10.0],
+            "position": [0.25, 0.5, 32.0],
+            "scale": [1.25, 1.25, 1.25]
+        },
+        {
+            "name" : "goomba2",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.001, 0.01, 0.01], "specular": [0.8, 0.8, 0.8], "n":12, "alpha":1.0},
+            "type": "mesh",
+            "model" : "./models/goomba.obj",
+            "enemy" : true,
+            "role" : "enemy",
+            "parent" : null,
+            "position": [0.25, 5.75, 60.0],
+            "scale": [1.25, 1.25, 1.25]
+        },
+        {
+            "name" : "goomba3",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.001, 0.01, 0.01], "specular": [0.8, 0.8, 0.8], "n":12, "alpha":1.0},
+            "type": "mesh",
+            "model" : "./models/goomba.obj",
+            "enemy" : true,
+            "role" : "enemy",
+            "parent" : null,
+            "position": [0.25, 0.5, 110.0],
             "scale": [1.25, 1.25, 1.25]
         },
         {
