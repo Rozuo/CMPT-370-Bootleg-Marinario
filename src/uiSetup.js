@@ -16,6 +16,7 @@ function setup() {
 
 function createSceneGui(state) {
     //get objects first
+    /*
     let sideNav = document.getElementById("objectsNav");
     sideNav.innerHTML = "";
 
@@ -49,6 +50,7 @@ function createSceneGui(state) {
 
     objectElement.appendChild(objectName);
     sideNav.appendChild(objectElement);
+    */
 
     /*
     let addNav = document.getElementById("addObjectsNav");

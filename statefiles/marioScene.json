@@ -6,37 +6,74 @@
             "material" : {"diffuse" : [0.8, 0.2, 0.2], "ambient": [0.001, 0.001, 0.001], "specular": [0.8, 0.8, 0.8], "n":50, "alpha":1.0},
             "type": "mesh",
             "model" : "./models/apple.obj",
+            "role" : "object",
             "parent" : null,
-            "position": [0.0, 0.0, 1.0],
-            "scale": [2.0, 2.0, 2.0]
+            "position": [0.25, 3.25, -3.85],
+            "scale": [1.2, 1.2, 1.2]
         },
         {
             "name" : "marinario",
-            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.001, 0.001, 0.001], "specular": [0.8, 0.8, 0.8], "n":12, "alpha":1.0},
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.02, 0.02, 0.02], "specular": [0.8, 0.8, 0.8], "n":12, "alpha":1.0},
             "type": "mesh",
             "model" : "./models/mario.obj",
+            "role" : "player",
             "texture": "./materials/PepsiMan.jpg",
             "parent" : null,
-            "position": [0.25, 0.5, 0.25],
+            "position": [0.25, 0.499, -2.25],
             "scale": [0.5, 0.5, 0.5]
         },
         {
-            "name" : "goomba",
-            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.001, 0.001, 0.001], "specular": [0.8, 0.8, 0.8], "n":12, "alpha":1.0},
+            "name" : "goomba0",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.001, 0.01, 0.01], "specular": [0.8, 0.8, 0.8], "n":12, "alpha":1.0},
             "type": "mesh",
             "model" : "./models/goomba.obj",
+            "enemy" : true,
+            "role" : "enemy",
             "parent" : null,
-
-            "position": [1.0, 0, 1.0],
-            "scale": [1.0, 1.0, 1.0]
+            "position": [0.25, 0.5, 25.0],
+            "scale": [1.25, 1.25, 1.25]
+        },
+        {
+            "name" : "goomba1",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.001, 0.01, 0.01], "specular": [0.8, 0.8, 0.8], "n":12, "alpha":1.0},
+            "type": "mesh",
+            "model" : "./models/goomba.obj",
+            "enemy" : true,
+            "role" : "enemy",
+            "parent" : null,
+            "position": [0.25, 0.5, 32.0],
+            "scale": [1.25, 1.25, 1.25]
+        },
+        {
+            "name" : "goomba2",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.001, 0.01, 0.01], "specular": [0.8, 0.8, 0.8], "n":12, "alpha":1.0},
+            "type": "mesh",
+            "model" : "./models/goomba.obj",
+            "enemy" : true,
+            "role" : "enemy",
+            "parent" : null,
+            "position": [0.25, 5.75, 60.0],
+            "scale": [1.25, 1.25, 1.25]
+        },
+        {
+            "name" : "goomba3",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.001, 0.01, 0.01], "specular": [0.8, 0.8, 0.8], "n":12, "alpha":1.0},
+            "type": "mesh",
+            "model" : "./models/goomba.obj",
+            "enemy" : true,
+            "role" : "enemy",
+            "parent" : null,
+            "position": [0.25, 0.5, 110.0],
+            "scale": [1.25, 1.25, 1.25]
         },
         {
             "name" : "koopaBod",
             "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.001, 0.001, 0.001], "specular": [0.8, 0.8, 0.8], "n":12, "alpha":1.0},
             "type": "mesh",
             "model" : "./models/koopaBod.obj",
+            "role" : "enemy",
             "parent" : null,
-            "position": [1.0, 0, 1.0],
+            "position": [0.25, 0.0, -18.0],
             "scale": [0.25, 0.25, 0.25]
         },
         {
@@ -44,36 +81,179 @@
             "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.001, 0.001, 0.001], "specular": [0.8, 0.8, 0.8], "n":12, "alpha":1.0},
             "type": "mesh",
             "model" : "./models/koopaAppendages.obj",
+            "role" : "enemy",
             "parent" : null,
-            "position": [1.0, 0, 1.0],
+            "position": [0.25, 0.0, -18.0],
             "scale": [0.25, 0.25, 0.25]
+        },
+        {
+            "name" : "platformQ",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.1, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
+            "type": "cube",
+            "texture": "./materials/qblock.png",
+            "role" : "platform",
+            "parent" : null,
+            "position": [0.0, 3.0, -4.1],
+            "scale": [1.0, 1.0, 1.0]
         },
         {
             "name" : "platform0",
             "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.1, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
             "type": "cube",
-            "texture": "./materials/floortile_hd.png",
+            "texture": "./materials/plywood.jpg",
+            "role" : "platform",
             "parent" : null,
-            "position": [0.0, 0.0, 0.0],
-            "scale": [2.0, 2.0, 4.0]
+            "position": [0.0, 0.0, -25.0],
+            "scale": [1.0, 1.0, 150.0]
         },
         {
             "name" : "platform1",
             "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.1, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
             "type": "cube",
-            "texture": "./materials/brickblock.png",
+            "texture": "./materials/plywood.jpg",
+            "role" : "platform",
             "parent" : null,
-            "position": [0.0, 3.0, 7.0],
+            "position": [0.0, 3.0, 6.0],
             "scale": [1.0, 1.0, 5.0]
         },
         {
             "name" : "platform2",
             "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.1, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
             "type": "cube",
-            "texture": "./materials/question_block_hd.png",
+            "texture": "./materials/plywood.jpg",
+            "role" : "platform",
             "parent" : null,
-            "position": [0.0, 6.0, 10],
+            "position": [0.0, 6.0, 12],
+            "scale": [1.0, 1.0, 32.0]
+        },
+        {
+            "name" : "platform3",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.1, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
+            "type": "cube",
+            "texture": "./materials/plywood.jpg",
+            "role" : "platform",
+            "parent" : null,
+            "position": [0.0, 5.25, 52.0],
             "scale": [1.0, 1.0, 30.0]
+        },
+         {
+            "name" : "platform4",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.1, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
+            "type": "cube",
+            "texture": "./materials/plywood.jpg",
+            "role" : "platform",
+            "parent" : null,
+            "position": [0.0, 8.5, 33.0],
+            "scale": [1.0, 1.0, 15.0]
+        },
+         {
+            "name" : "platform5",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.1, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
+            "type": "cube",
+            "texture": "./materials/plywood.jpg",
+            "role" : "platform",
+            "parent" : null,
+            "position": [0.0, 0.0, 57.0],
+            "scale": [1.0, 1.0, 20.0]
+        },
+        {
+            "name" : "platform6",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.1, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
+            "type": "cube",
+            
+            "role" : "platform",
+            "parent" : null,
+            "position": [0.0, 8.5, 80.0],
+            "scale": [1.0, 1.0, 5.0]
+        },
+        {
+            "name" : "platform7",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.1, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
+            "type": "cube",
+            "texture": "./materials/plywood.jpg",
+            "role" : "platform",
+            "parent" : null,
+            "position": [0.0, 1.8, 72.0],
+            "scale": [1.0, 1.0, 6.0]
+        },
+        {
+            "name" : "platform8",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.1, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
+            "type": "cube",
+            
+            "role" : "platform",
+            "parent" : null,
+            "position": [0.0, 8.5, 71.0],
+            "scale": [1.0, 1.0, 3.0]
+        },
+        {
+            "name" : "platform9",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.1, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
+            "type": "cube",
+            "texture": "./materials/plywood.jpg",
+            "role" : "platform",
+            "parent" : null,
+            "position": [0.0, 3.0, 80.0],
+            "scale": [1.0, 1.0, 5.0]
+        },
+        {
+            "name" : "platform10",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.1, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
+            "type": "cube",
+            "texture": "./materials/plywood.jpg",
+            "role" : "platform",
+            "parent" : null,
+            "position": [0.0, 1.8, 87.0],
+            "scale": [1.0, 1.0, 8.0]
+        },
+        {
+            "name" : "platform11",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.1, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
+            "type": "cube",
+            "texture": "./materials/plywood.jpg",
+            "role" : "platform",
+            "parent" : null,
+            "position": [0.0, 0.0, 95.0],
+            "scale": [1.0, 1.0, 100.0]
+        },
+        {
+            "name" : "platform12",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.1, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
+            "type": "cube",
+            "texture": "./materials/plywood.jpg",
+            "role" : "platform",
+            "parent" : null,
+            "position": [0.0, 7.0, 92.0],
+            "scale": [1.0, 1.0, 50.0]
+        },
+        {
+            "name" : "platform13",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.1, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
+            "type": "cube",
+            "texture": "./materials/plywood.jpg",
+            "role" : "platform",
+            "parent" : null,
+            "position": [0.0, 7.0, 125.0],
+            "scale": [1.0, 1.0, 10.0]
+        },
+                {
+            "name" : "platform14",
+            "material" : {"diffuse" : [0.2, 0.2, 0.2], "ambient": [0.1, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
+            "type": "cube",
+            "texture": "./materials/plywood.jpg",
+            "role" : "platform",
+            "parent" : null,
+            "position": [0.0, 6.5, 137.0],
+            "scale": [1.0, 1.0, 5.0]
+        },
+        {
+            "name" : "exit",
+            "material" : {"diffuse" : [0.8, 0.2, 0.2], "ambient": [0.8, 0.1, 0.1], "specular": [0.8, 0.8, 0.8], "n":10, "alpha":1.0},
+            "type": "cube",
+            "role" : "exit",
+            "parent" : null,
+            "position": [0.0, 0.0, 145.0],
+            "scale": [1.0, 25.0, 1.0]
         },
         {
             "name": "light0",
@@ -83,17 +263,17 @@
             "material" : {"diffuse" : [1.0, 1.0, 1.0], "ambient": [0.1, 0.1, 0.1], "specular": [0.3, 0.3, 0.3], "n":1000, "alpha":1.0},
             "colour" : [1.0, 1.0, 1.0],
             "parent" : null,
-            "strength" : 0.75
+            "strength" : 2.75
         },
         {
             "name": "light1",
             "type": "light",
             "model" : "./models/lightbulb.obj",
-            "position" : [1.9, 0.8, 2.5],
+            "position" : [-11.0, 4.0, 25.0],
             "material" : {"diffuse" : [1.0, 1.0, 1.0], "ambient": [0.1, 0.1, 0.1], "specular": [0.3, 0.3, 0.3], "n":1000, "alpha":1.0},
             "colour" : [1.0, 1.0, 1.0],
             "parent" : null,
-            "strength" : 0.75
+            "strength" : 2.75
         }
     ]
 }

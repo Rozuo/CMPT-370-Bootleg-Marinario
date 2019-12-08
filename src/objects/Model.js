@@ -1,10 +1,11 @@
 class Model {
-    constructor(glContext, name, meshDetails, parent = null, ambient, diffuse, specular, n, alpha, texture) {
+    constructor(glContext, name, meshDetails, parent = null, enemy = undefined, ambient, diffuse, specular, n, alpha, texture) {
         this.gl = glContext;
         this.name = name;
         this.parent = parent;
         this.type = "mesh";
         this.loaded = false;
+        this.enemy = enemy;
 
         this.material = { ambient, diffuse, specular, n, alpha };
         this.model = {
@@ -19,6 +20,8 @@ class Model {
         this.modelMatrix = mat4.create();
 
         this.lightingShader = this.lightingShader.bind(this);
+
+        this.fromWhichWay = true;
     }
 
     scale(scaleVec) {
