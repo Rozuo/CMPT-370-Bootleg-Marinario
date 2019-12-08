@@ -213,6 +213,7 @@ function main() {
         bounceLeft: 0,
         bounceRight: 0,
         collision: 0,
+        score: 0,
         previous: vec3.fromValues(0.0, 0.0, 0.25),
         camera: {
             name: 'camera',
@@ -414,10 +415,16 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                 console.log(duration/1000);
 
                 //calculate score
-                var score = ((120 - (duration/1000)) * 100);  //example score
+                //# enemies killed, time taken, player y value upon reaching exit
+                if(duration/1000 > 120){
+                    state.score = 0;        //too long
+                } else {
+                    state.score += ((120 - (duration/1000)) * 100);         //time bonus
+                    state.score += (player.model.position[1]-500) * 300;    //height bonus
+                }
 
                 //message user, reload game
-                alert("Level clear! Your time was: " + duration/1000);
+                alert("Level clear! Your score was: " + parseInt(state.score));
                 document.location.reload();
                 }
 
