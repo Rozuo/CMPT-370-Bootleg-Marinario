@@ -278,8 +278,7 @@ function main() {
     } 
 
     //variable for keeping track of time elapsed
-    var d = new Date();
-    console.log(d.getTime());
+    var startTime = new Date();
 
     //separate variable for exit object
     let exit = getObject(state, "exit");
@@ -292,7 +291,7 @@ function main() {
     }) */
 
                             //pass collision lists to the render function
-    startRendering(gl, state, platforms, enemies, exit);
+    startRendering(gl, state, platforms, enemies, exit, startTime);
 
 }
 
@@ -322,7 +321,7 @@ function addObjectToScene(state, object) {
  * @param {object - object containing scene values} state 
  * @purpose - Calls the drawscene per frame
  */
-function startRendering(gl, state, platforms, enemies, exit) {
+function startRendering(gl, state, platforms, enemies, exit, startTime) {
     // A variable for keeping track of time between frames
     var then = 0.0;
 
@@ -388,6 +387,7 @@ function startRendering(gl, state, platforms, enemies, exit) {
                 player.model.position[1] += 0.15;    //y value increase per tick - jump speed
             }
 
+
     //PRELIMINARY COLLISIONS
             //pit-checker
             if ((player.model.position[1] < -2.5)){
@@ -408,8 +408,16 @@ function startRendering(gl, state, platforms, enemies, exit) {
                 player.model.position[1] += 500;
                 player.model.position[2] += 1;
 
+                //calculate time
+                var finish = new Date();
+                var duration = finish.getTime() - startTime.getTime();
+                console.log(duration/1000);
+
+                //calculate score
+                var score = ((120 - (duration/1000)) * 100);  //example score
+
                 //message user, reload game
-                alert("Level Clear!");
+                alert("Level clear! Your time was: " + duration/1000);
                 document.location.reload();
                 }
 
@@ -470,9 +478,10 @@ function startRendering(gl, state, platforms, enemies, exit) {
 
             //if invincible
             if (state.invincible){
+                console.log(player.material.alpha);
                 if(state.invincible === 1){
                     //revert back to original appearance if invincibility is about to wear off
-                    player.material.diffuse = vec3.fromValues(0.2, 0.2, 0.2);
+                    player.material.alpha = 0.5;
                 }
                 //reduce counter
                 state.invincible--;
