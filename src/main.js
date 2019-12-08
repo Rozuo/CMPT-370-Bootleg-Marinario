@@ -238,6 +238,37 @@ function main() {
             let tempCube = new Cube(gl, object.name, object.parent, object.material.ambient, object.material.diffuse, object.material.specular, object.material.n, object.material.alpha, object.texture, object.textureNorm);
             tempCube.vertShader = vertShaderSample;
             tempCube.fragShader = fragShaderSample;
+
+            if (object.scale){//checks if scale exists
+              for (let i=0; i<tempCube.model.uvs.length; i+=2){//scales tempCube.model.uvs by the scale values in the json
+                if (i<8){//front uvs
+                  tempCube.model.uvs[i] *= object.scale[0];//x value
+                  tempCube.model.uvs[i+1] *= object.scale[1];//y value
+                }
+                else if (i<16){//back uvs
+                  tempCube.model.uvs[i] *= object.scale[0];//x value
+                  tempCube.model.uvs[i+1] *= object.scale[1];//y value
+                }
+                else if (i<24){//left uvs
+                  tempCube.model.uvs[i] *= object.scale[1];//y value
+                  tempCube.model.uvs[i+1] *= object.scale[2];//z value
+                }
+                else if (i<32){//right uvs
+                  tempCube.model.uvs[i] *= object.scale[1];//y value
+                  tempCube.model.uvs[i+1] *= object.scale[2];//z value
+                }
+                else if (i<40){//top uvs
+                  tempCube.model.uvs[i] *= object.scale[2];//z value
+                  tempCube.model.uvs[i+1] *= object.scale[0];//x value
+                }
+                else if (i<48){//bottom uvs
+                  tempCube.model.uvs[i] *= object.scale[2];//z value
+                  tempCube.model.uvs[i+1] *= object.scale[0];//x value
+                }
+              }
+            }
+            //console.log("tempcube uvs: "+tempCube.model.uvs);
+
             tempCube.setup();
             tempCube.model.position = vec3.fromValues(object.position[0], object.position[1], object.position[2]);
             if (object.scale) {
@@ -350,6 +381,10 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                 startGame(state);
                 state.gameStarted = true;
             }
+          
+            var bgm = document.getElementById("overworld");
+                bgm.loop=true;
+                bgm.play();
 
             //keeps track of player's position from last frame - for collision direction detection
             state.previous = vec3.fromValues(player.model.position[0], player.model.position[1], player.model.position[2]);
@@ -357,6 +392,7 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
     //PLAYER CONTROLS
             //POTENTIAL TODO: direction facing tag, rotate object to face walking direction
 
+            //PLAYER DIRECTION
             if (state.keyboard["w"]) {
                 //if in first person and not currently bouncing back
                 if (state.isFirstPerson && !state.bounceRight){
