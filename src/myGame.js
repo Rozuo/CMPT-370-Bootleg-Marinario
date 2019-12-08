@@ -37,7 +37,17 @@ function startGame(state) {
                 state.keyboard[event.key] = true;
                 break;
 
+            case "KeyC":
+                if (state.keyboard[event.key] === true){
+                    state.keyboard[event.key] = false;
+                } else {
+                    state.keyboard[event.key] = true;
+                }
+                //state.keyboard[event.key] = true;       
+                break;  
+            
             case "Space":
+                //jump
                 state.keyboard[event.key] = true;
                 break;
 

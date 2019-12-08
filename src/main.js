@@ -197,10 +197,12 @@ function main() {
         keyboard: {},
         mouse: { sensitivity: 0.2 },
         gameStarted: false,
+
+        isFirstPerson: false,
         camera: {
             name: 'camera',
-            position: vec3.fromValues(0.5, 0.0, -2.5),
-            center: vec3.fromValues(0.5, 0.0, 0.0),
+            position: vec3.fromValues(-10.0, 4.0, 0.0),
+            center: vec3.fromValues(0.0, 4.0, 0.0),
             up: vec3.fromValues(0.0, 1.0, 0.0),
             pitch: 0,
             yaw: 0,
@@ -220,6 +222,37 @@ function main() {
             let tempCube = new Cube(gl, object.name, object.parent, object.material.ambient, object.material.diffuse, object.material.specular, object.material.n, object.material.alpha, object.texture, object.textureNorm);
             tempCube.vertShader = vertShaderSample;
             tempCube.fragShader = fragShaderSample;
+
+            if (object.scale){//checks if scale exists
+              for (let i=0; i<tempCube.model.uvs.length; i+=2){//scales tempCube.model.uvs by the scale values in the json
+                if (i<8){//front uvs
+                  tempCube.model.uvs[i] *= object.scale[0];//x value
+                  tempCube.model.uvs[i+1] *= object.scale[1];//y value
+                }
+                else if (i<16){//back uvs
+                  tempCube.model.uvs[i] *= object.scale[0];//x value
+                  tempCube.model.uvs[i+1] *= object.scale[1];//y value
+                }
+                else if (i<24){//left uvs
+                  tempCube.model.uvs[i] *= object.scale[1];//y value
+                  tempCube.model.uvs[i+1] *= object.scale[2];//z value
+                }
+                else if (i<32){//right uvs
+                  tempCube.model.uvs[i] *= object.scale[1];//y value
+                  tempCube.model.uvs[i+1] *= object.scale[2];//z value
+                }
+                else if (i<40){//top uvs
+                  tempCube.model.uvs[i] *= object.scale[2];//z value
+                  tempCube.model.uvs[i+1] *= object.scale[0];//x value
+                }
+                else if (i<48){//bottom uvs
+                  tempCube.model.uvs[i] *= object.scale[2];//z value
+                  tempCube.model.uvs[i+1] *= object.scale[0];//x value
+                }
+              }
+            }
+            //console.log("tempcube uvs: "+tempCube.model.uvs);
+
             tempCube.setup();
             tempCube.model.position = vec3.fromValues(object.position[0], object.position[1], object.position[2]);
             if (object.scale) {
@@ -287,31 +320,51 @@ function startRendering(gl, state) {
 
         state.deltaTime = deltaTime;
 
+        let player = getObject(state, "marinario");
+
         //wait until the scene is completely loaded to render it
         if (state.numberOfObjectsToLoad <= state.objects.length) {
             if (!state.gameStarted) {
                 startGame(state);
                 state.gameStarted = true;
             }
-
+          
             var bgm = document.getElementById("overworld");
-            bgm.loop=true;
-            bgm.play();
+                bgm.loop=true;
+                bgm.play();
 
+            //PLAYER DIRECTION
             if (state.keyboard["w"]) {
-                moveForward(state);
-                //console.log("w pressed");
-                //document.getElementById("powerup").play();
+                //forward, first person
+                vec3.add(player.model.position, player.model.position, vec3.fromValues(0.0, 0.0, 0.2));
             }
             if (state.keyboard["s"]) {
-                moveBackward(state);
-                //document.getElementById("stageclear").play();
+                //backward, first person
+                vec3.add(player.model.position, player.model.position, vec3.fromValues(0.0, 0.0, -0.2));
             }
             if (state.keyboard["a"]) {
-                moveLeft(state);
-                //document.getElementById("jumplarge").play();
+                //forward while in "2d" view
+                vec3.add(player.model.position, player.model.position, vec3.fromValues(0.0, 0.0, -0.2));
             }
             if (state.keyboard["d"]) {
+                //backwards while in "2d" view
+                vec3.add(player.model.position, player.model.position, vec3.fromValues(0.0, 0.0, 0.2));
+            }
+            //CAMERA
+            if (state.keyboard["W"]) {
+                //camera (debug)
+                moveForward(state);
+            }
+            if (state.keyboard["S"]) {
+                //camera (debug)
+                moveBackward(state);
+            }
+            if (state.keyboard["A"]) {
+                //camera (debug)
+                moveLeft(state);
+            }
+            if (state.keyboard["D"]) {
+                //camera (debug)
                 moveRight(state);
                 //document.getElementById("1up").play();
             }
@@ -320,16 +373,35 @@ function startRendering(gl, state) {
               //document.getElementById("jumpsmall").play();
             }
 
+            if (state.keyboard["c"]) {
+                //toggle view to first person
+                state.camera.position[0] = player.model.position[0] + 0;    //front side of player
+                state.camera.position[1] = player.model.position[1] + 1;    //top of player
+                state.camera.position[2] = player.model.position[2] + 0.5;
+
+                state.camera.center = vec3.fromValues(player.model.position[0] + 0.25,
+                                                    player.model.position[1]+1,
+                                                    player.model.position[2]+2);
+            }
+            if (!state.keyboard["c"]) {
+                //return view to "mock 2d"
+                state.camera.position[0] = -10;     //front side of player
+                state.camera.position[1] = 5;       //top of player
+                state.camera.position[2] = player.model.position[2];
+
+                state.camera.center = vec3.fromValues(0, 5, player.model.position[2]);
+            }
+            //Mouse-camera movement 0 debug
+
             if (state.mouse['camMove']) {
                 //vec3.rotateY(state.camera.center, state.camera.center, state.camera.position, (state.camera.yaw - 0.25) * deltaTime * state.mouse.sensitivity);
                 vec3.rotateY(state.camera.center, state.camera.center, state.camera.position, (-state.mouse.rateX * deltaTime * state.mouse.sensitivity));
             }
 
             let apple = getObject(state, "apple");
-            let alien = getObject(state, "marinario");
 
-            apple.centroid = alien.model.position;
-            mat4.rotateY(apple.model.rotation, apple.model.rotation, 0.3 * deltaTime);
+            //apple.centroid = player.model.position;
+            //mat4.rotateY(apple.model.rotation, apple.model.rotation, 0.3 * deltaTime);
 
 
             // Draw our scene
@@ -352,7 +424,8 @@ function startRendering(gl, state) {
  * @purpose Iterate through game objects and render the objects aswell as update uniforms
  */
 function drawScene(gl, deltaTime, state) {
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+
+    gl.clearColor(0.6, 0.6, 0.99, 1.0);
     gl.enable(gl.DEPTH_TEST); // Enable depth testing
     gl.depthFunc(gl.LEQUAL); // Near things obscure far things
     gl.clearDepth(1.0); // Clear everything
@@ -396,7 +469,8 @@ function drawScene(gl, deltaTime, state) {
                 );
                 gl.uniformMatrix4fv(object.programInfo.uniformLocations.view, false, viewMatrix);
 
-               gl.uniform3fv(object.programInfo.uniformLocations.cameraPosition, state.camera.position);
+                gl.uniform3fv(object.programInfo.uniformLocations.cameraPosition, state.camera.position);
+
 
                 state.viewMatrix = viewMatrix;
 
