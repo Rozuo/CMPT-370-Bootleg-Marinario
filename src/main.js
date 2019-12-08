@@ -328,6 +328,10 @@ function startRendering(gl, state) {
                 startGame(state);
                 state.gameStarted = true;
             }
+          
+            var bgm = document.getElementById("overworld");
+                bgm.loop=true;
+                bgm.play();
 
             //PLAYER DIRECTION
             if (state.keyboard["w"]) {
@@ -362,6 +366,11 @@ function startRendering(gl, state) {
             if (state.keyboard["D"]) {
                 //camera (debug)
                 moveRight(state);
+                //document.getElementById("1up").play();
+            }
+            if (state.keyboard[" "]){//spacebar
+              //console.log("space pressed");
+              //document.getElementById("jumpsmall").play();
             }
 
             if (state.keyboard["c"]) {
