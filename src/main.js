@@ -402,8 +402,6 @@ function startRendering(gl, state, platforms, enemies, exit, startTime, bgm) {
             state.previous = vec3.fromValues(player.model.position[0], player.model.position[1], player.model.position[2]);
 
     //PLAYER CONTROLS
-            //POTENTIAL TODO: direction facing tag, rotate object to face walking direction
-
             //PLAYER DIRECTION
             if (state.keyboard["w"]) {
                 //if in first person and not currently bouncing back
@@ -483,10 +481,8 @@ function startRendering(gl, state, platforms, enemies, exit, startTime, bgm) {
                 //calculate time
                 var finish = new Date();
                 var duration = finish.getTime() - startTime.getTime();
-                //console.log(duration/1000);
 
                 //calculate score
-                //# enemies killed, time taken, player y value upon reaching exit
                 if(duration/1000 > 120){
                     state.score = 0;        //too long
                     document.getElementById("scoreDisplay").innerHTML = state.score;
@@ -562,7 +558,7 @@ function startRendering(gl, state, platforms, enemies, exit, startTime, bgm) {
                 //console.log(player.material.alpha);
                 if(state.invincible === 1){
                     //revert back to original appearance if invincibility is about to wear off
-                    player.material.alpha = 0.5;
+                    player.material.diffuse = vec3.fromValues(0.2, 0.2, 0.2);
                 }
                 //reduce counter
                 state.invincible--;
@@ -598,7 +594,7 @@ function startRendering(gl, state, platforms, enemies, exit, startTime, bgm) {
                         document.getElementById("stomp").play();
                         state.bounce = 20;
                         player.model.position[1] += 0.15;
-                        //enemies[i].position[1] -= 10; //quick fix to get enemy to disappear when hit
+                        enemies[i].position[1] -= 10; //quick fix to get enemy to disappear when hit
                     } else {
                         if (state.swole){
                             document.getElementById("pipe").play();
@@ -606,7 +602,7 @@ function startRendering(gl, state, platforms, enemies, exit, startTime, bgm) {
                             player.model.scale[1] *= 0.66;
                             player.model.scale[2] *= 0.84;
                             state.invincible = 100;
-                            player.material.diffuse = vec3.fromValues(0.8, 0.8, 0.8);
+                            player.material.diffuse = vec3.fromValues(1.0, 1.0, 1.0);
                         } else {
                             if (!state.invincible){
 
