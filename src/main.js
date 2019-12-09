@@ -327,6 +327,10 @@ function main() {
         getMousePick(event, state);
     }) */
 
+    var bgm = document.getElementById("overworld");
+    bgm.loop=true;
+    bgm.play();
+
                             //pass collision lists to the render function
     startRendering(gl, state, platforms, enemies, exit, startTime);
 
@@ -371,6 +375,11 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
 
         state.deltaTime = deltaTime;
 
+        let currentTime = new Date();
+        let elapsedTime = currentTime.getTime() - startTime.getTime();
+        //console.log("time: "+(elapsedTime/1000));
+        document.getElementById("timeDisplay").innerHTML = (elapsedTime/1000).toFixed(0);
+
         //initialize some objects that aren't passed to function
         let player = getObject(state, "marinario");
         let apple = getObject(state, "apple");
@@ -382,10 +391,6 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                 state.gameStarted = true;
             }
 
-            var bgm = document.getElementById("overworld");
-                bgm.loop=true;
-                bgm.play();
-
             //keeps track of player's position from last frame - for collision direction detection
             state.previous = vec3.fromValues(player.model.position[0], player.model.position[1], player.model.position[2]);
 
@@ -394,6 +399,8 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
 
             //PLAYER DIRECTION
             if (state.keyboard["w"]) {
+              state.score += 1;
+              document.getElementById("scoreDisplay").innerHTML = state.score;
                 //if in first person and not currently bouncing back
                 if (state.isFirstPerson && !state.bounceRight){
                     //move forward
@@ -463,6 +470,7 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                     state.score += ((120 - (duration/1000)) * 100);         //time bonus
                     state.score += (player.model.position[1]-500) * 300;    //height bonus
                 }
+                document.getElementById("scoreDisplay").innerHTML = state.score;
 
                 //message user, reload game
                 alert("Level clear! Your score was: " + parseInt(state.score));
