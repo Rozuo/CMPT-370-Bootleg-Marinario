@@ -378,7 +378,7 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
         let currentTime = new Date();
         let elapsedTime = currentTime.getTime() - startTime.getTime();
         //console.log("time: "+(elapsedTime/1000));
-        document.getElementById("timeDisplay").innerHTML = (elapsedTime/1000).toFixed(0);
+        document.getElementById("timeDisplay").innerHTML = 120 - (elapsedTime/1000).toFixed(0);//starts at 120, counts down
 
         //initialize some objects that aren't passed to function
         let player = getObject(state, "marinario");
@@ -399,8 +399,6 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
 
             //PLAYER DIRECTION
             if (state.keyboard["w"]) {
-              state.score += 1;
-              document.getElementById("scoreDisplay").innerHTML = state.score;
                 //if in first person and not currently bouncing back
                 if (state.isFirstPerson && !state.bounceRight){
                     //move forward
@@ -466,11 +464,13 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                 //# enemies killed, time taken, player y value upon reaching exit
                 if(duration/1000 > 120){
                     state.score = 0;        //too long
+                    document.getElementById("scoreDisplay").innerHTML = state.score;
                 } else {
-                    state.score += ((120 - (duration/1000)) * 100);         //time bonus
-                    state.score += (player.model.position[1]-500) * 300;    //height bonus
+                    state.score += ((120 - (duration/1000).toFixed(0)) * 125);         //time bonus
+                    //state.score += (player.model.position[1]-500) * 300;    //height bonus
+                    document.getElementById("scoreDisplay").innerHTML = state.score;
                 }
-                document.getElementById("scoreDisplay").innerHTML = state.score;
+
 
                 //message user, reload game
                 alert("Level clear! Your score was: " + parseInt(state.score));
@@ -552,6 +552,8 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                     state.swole = true;
                     //"hide" apple
                     apple.model.position = vec3.fromValues(0.0, -4.0, -2.0);
+                    state.score += 1000;
+                    document.getElementById("scoreDisplay").innerHTML = state.score;
                 }
             }
 
@@ -565,6 +567,8 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                     //console.log(enemies[i].name);
                     if (state.previous[1] > player.model.position[1] + 0.01){ //if player is colliding from above
                         console.log("squish");
+                        state.score += 100;
+                        document.getElementById("scoreDisplay").innerHTML = state.score;
                         state.bounce = 20;
                         player.model.position[1] += 0.15;
                         //enemies[i].position[1] -= 10; //quick fix to get enemy to disappear when hit
