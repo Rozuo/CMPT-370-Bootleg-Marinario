@@ -325,11 +325,12 @@ function main() {
     }) */
 
     var bgm = document.getElementById("overworld");
+    var bgmhurry;
     bgm.loop=true;
     bgm.play();
 
                             //pass collision lists to the render function
-    startRendering(gl, state, platforms, enemies, exit, startTime, bgm);
+    startRendering(gl, state, platforms, enemies, exit, startTime, bgm, bgmhurry);
 
 }
 
@@ -359,7 +360,7 @@ function addObjectToScene(state, object) {
  * @param {object - object containing scene values} state
  * @purpose - Calls the drawscene per frame
  */
-function startRendering(gl, state, platforms, enemies, exit, startTime, bgm) {
+function startRendering(gl, state, platforms, enemies, exit, startTime, bgm, bgmhurry) {
     // A variable for keeping track of time between frames
     var then = 0.0;
 
@@ -394,7 +395,7 @@ function startRendering(gl, state, platforms, enemies, exit, startTime, bgm) {
 
             if ((120 - (elapsedTime/1000).toFixed(0)) === 40){//running out of time
               bgm.pause()
-              var bgmhurry = document.getElementById("overworldhurry");
+              bgmhurry = document.getElementById("overworldhurry");
               bgmhurry.play()
             }
 
@@ -646,7 +647,6 @@ function startRendering(gl, state, platforms, enemies, exit, startTime, bgm) {
                     if(Math.abs(player.model.position[2] - apple.model.position[2]) < 0.5){
                         if(Math.abs(player.model.position[1] - apple.model.position[1]) < 1){
                             document.getElementById("powerupappear").play()
-                            console.log(platforms[collisionIndex].model.texture);
                             apple.model.position[1] += 0.5;
                         }
                     }
