@@ -466,8 +466,12 @@ function startRendering(gl, state, platforms, enemies, exit, startTime, bgm) {
 
             //exit-checker - checks player's position z value vs. exit's position
             if (Math.abs(player.model.position[2] - exit.model.position[2]) < 0.5){
-                bgm.pause();
-                bgmhurry.pause();
+                if ((120 - (elapsedTime/1000).toFixed(0)) > 40){
+                  bgm.pause();
+                }
+                else if ((120 - (elapsedTime/1000).toFixed(0)) < 40){
+                  bgmhurry.pause();
+                }
                 //document.getElementById("flagpole").play();
                 document.getElementById("stageclear").play();
             }
