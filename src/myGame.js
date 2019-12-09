@@ -51,6 +51,7 @@ function startGame(state) {
                     //if standing on solid surface
                     if (state.collision){
                         //jump for 25 frames
+                        document.getElementById("jumpsmall").play();
                         state.jump = 25;
                     }
 
