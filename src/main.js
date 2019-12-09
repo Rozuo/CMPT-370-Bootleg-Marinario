@@ -324,9 +324,9 @@ function main() {
         getMousePick(event, state);
     }) */
 
-    var bgm = document.getElementById("overworld");
-    bgm.loop=true;
-    bgm.play();
+    // var bgm = document.getElementById("overworld");
+    // bgm.loop=true;
+    // bgm.play();
 
                             //pass collision lists to the render function
     startRendering(gl, state, platforms, enemies, exit, startTime);
@@ -452,6 +452,7 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                 player.model.position[1] += 500;
 
                 //message user, reload game
+                document.getElementById("gameover").play()
 
                 alert("Game over");
                 document.location.reload();
@@ -460,6 +461,7 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
             //exit-checker - checks player's position z value vs. exit's position
             if (Math.abs(player.model.position[2] - exit.model.position[2]) < 0.5){
                 bgm.pause();
+                document.getElementById("flagpole").play();
                 document.getElementById("stageclear").play();
             }
             if (Math.abs(player.model.position[2] - exit.model.position[2]) < 0.15){
@@ -470,7 +472,7 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                 //calculate time
                 var finish = new Date();
                 var duration = finish.getTime() - startTime.getTime();
-                console.log(duration/1000);
+                //console.log(duration/1000);
 
                 //calculate score
                 //# enemies killed, time taken, player y value upon reaching exit
@@ -582,13 +584,13 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                         console.log("squish");
                         state.score += 100;
                         document.getElementById("scoreDisplay").innerHTML = state.score;
-                        document.getElementById("kick").play();
+                        document.getElementById("stomp").play();
                         state.bounce = 20;
                         player.model.position[1] += 0.15;
                         //enemies[i].position[1] -= 10; //quick fix to get enemy to disappear when hit
                     } else {
                         if (state.swole){
-                            document.getElementById("warning").play();
+                            document.getElementById("pipe").play();
                             state.swole = false;
                             player.model.scale[1] *= 0.66;
                             player.model.scale[2] *= 0.84;
@@ -600,6 +602,8 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                                     state.keyboard[i] = false;
                                 }
                                 bgm.pause();
+                                document.getElementById("mariodie").play();
+                                document.getElementById("gameover").play()
                                 alert("Game over");
                                 state.invincible = 100;
                                 document.location.reload();
@@ -624,7 +628,7 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                         player.model.position[1] + 0.75 - platforms[collisionIndex].model.position[1])){
                             //headbonk, stop jump
                             state.jump = 0;
-                            document.getElementById("bump").play();
+                            document.getElementById("breakblock").play();
                             console.log("bonk");
                     }
 
@@ -632,6 +636,7 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                     //release apple from block
                     if(Math.abs(player.model.position[2] - apple.model.position[2]) < 0.5){
                         if(Math.abs(player.model.position[1] - apple.model.position[1]) < 1){
+                            document.getElementById("powerupappear").play()
                             console.log(platforms[collisionIndex].model.texture);
                             apple.model.position[1] += 0.5;
                         }
