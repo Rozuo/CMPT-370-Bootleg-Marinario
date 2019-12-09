@@ -437,7 +437,13 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
 
     //PRELIMINARY COLLISIONS
             //pit-checker
+            if ((player.model.position[1] < -2)){
+                bgm.pause();
+                document.getElementById("mariodie").play();
+            }
+
             if ((player.model.position[1] < -2.5)){
+
                 for(let i = 0; i < state.keyboard.length; i++){
                     state.keyboard[i] = false;
                 }
@@ -445,11 +451,19 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                 player.model.position[1] += 500;
 
                 //message user, reload game
+
                 alert("Game over");
                 document.location.reload();
                 }
 
             //exit-checker - checks player's position z value vs. exit's position
+
+            if (Math.abs(player.model.position[2] - exit.model.position[2]) < 0.5){
+                bgm.pause();
+                document.getElementById("stageclear").play();
+            }
+
+
             if (Math.abs(player.model.position[2] - exit.model.position[2]) < 0.15){
                 //patchwork solution to prevent multiple alerts from playing
                 player.model.position[1] += 500;
@@ -547,6 +561,7 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
             if(Math.abs(player.model.position[2] - apple.model.position[2]) < 0.5){
                 if(Math.abs((player.model.position[1] + 0.25) - apple.model.position[1]) < 0.2){
                     //get swole
+                    document.getElementById("powerup").play();
                     player.model.scale[1] *= 1.5;
                     player.model.scale[2] *= 1.2;
                     state.swole = true;
@@ -569,11 +584,13 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                         console.log("squish");
                         state.score += 100;
                         document.getElementById("scoreDisplay").innerHTML = state.score;
+                        document.getElementById("kick").play();
                         state.bounce = 20;
                         player.model.position[1] += 0.15;
                         //enemies[i].position[1] -= 10; //quick fix to get enemy to disappear when hit
                     } else {
                         if (state.swole){
+                            document.getElementById("warning").play();
                             state.swole = false;
                             player.model.scale[1] *= 0.66;
                             player.model.scale[2] *= 0.84;
@@ -584,6 +601,7 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                                 for(let i = 0; i < state.keyboard.length; i++){
                                     state.keyboard[i] = false;
                                 }
+                                bgm.pause();
                                 alert("Game over");
                                 state.invincible = 100;
                                 document.location.reload();
@@ -608,6 +626,7 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                         player.model.position[1] + 0.75 - platforms[collisionIndex].model.position[1])){
                             //headbonk, stop jump
                             state.jump = 0;
+                            document.getElementById("bump").play();
                             console.log("bonk");
                     }
 
@@ -626,6 +645,7 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                 if (state.previous[2] < platforms[collisionIndex].model.position[2]){
                     player.model.position[2] -= 0.15;
                     //begin bounce-off sequence
+                    document.getElementById("bump").play();
                     state.bounceLeft = 15;
                     console.log("right");
                 }
@@ -634,6 +654,7 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                 if (state.previous[2] > platforms[collisionIndex].model.position[2] + platforms[collisionIndex].model.scale[2] /2 ){
                     player.model.position[2] += 0.15;
                     //begin bounce-off sequence
+                    document.getElementById("bump").play();
                     state.bounceRight = 15;
                     console.log("left");
                 }
@@ -670,6 +691,7 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                 //vec3.rotateY(state.camera.center, state.camera.center, state.camera.position, (state.camera.yaw - 0.25) * deltaTime * state.mouse.sensitivity);
                 vec3.rotateY(state.camera.center, state.camera.center, state.camera.position, (-state.mouse.rateX * deltaTime * state.mouse.sensitivity));
             }
+
 
     //ENEMY MOVEMENT
             enemyPatrol(getObject(state, "goomba0"), 13, 23);
