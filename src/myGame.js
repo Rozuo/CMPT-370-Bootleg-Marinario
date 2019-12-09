@@ -43,15 +43,20 @@ function startGame(state) {
                     state.keyboard[event.key] = true;
                 }
 
-                break;     
-            
+                break;
+
             case "Space":
                 //if not jumping
                 if (state.jump === 0){
                     //if standing on solid surface
                     if (state.collision){
                         //jump for 25 frames
-                        document.getElementById("jumpsmall").play();
+                        if (state.swole === true){
+                          document.getElementById("jumplarge").play();
+                        }
+                        else if (state.swole === false){
+                          document.getElementById("jumpsmall").play();
+                        }
                         state.jump = 25;
                     }
 
