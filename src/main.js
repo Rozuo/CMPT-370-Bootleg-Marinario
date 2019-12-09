@@ -689,6 +689,7 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
 
             //enemyPatrol(getObject(state, "koopaBod"),-13, -23);
 
+
     //Draw/Render calls
             // Draw our scene
             drawScene(gl, deltaTime, state);

@@ -42,7 +42,7 @@ function startGame(state) {
                 } else {
                     state.keyboard[event.key] = true;
                 }
- 
+
                 break;     
             
             case "Space":
