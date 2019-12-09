@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>WebGL Engine</title>
+    <title>Super Marinario Bros.</title>
     <link rel="shortcut icon" href="favicon.ico" />
     <link rel="stylesheet" type="text/css" href="./style/bootstrap.css">
     <link rel="stylesheet" type="text/css" href="./style/style.css">
@@ -43,11 +43,25 @@
             </div>
             <div class="mx-auto text-center" id="selectedObject">
             </div> -->
-            <div class="mx-auto text-center my-5"><h3>Time</h3></div>
+            <div class="mx-auto text-center my-5"><h2><u>Time</u></h2></div>
             <p class="mx-auto text-center" id="timeDisplay">120</p>
 
-            <div class="mx-auto text-center my-5"><h3>Score</h3></div>
+            <div class="mx-auto text-center my-5"><h2><u>Score</u></h2></div>
             <p class="mx-auto text-center" id="scoreDisplay">0</p>
+
+            <br/><br/>
+            <p><h1><u>Controls</u></h1></p>
+            <p><h2>Side view</h2></p>
+            <li>a — Move left</li>
+            <li>d — Move right</li>
+            <li>Spacebar — Jump</li>
+            <li>c - Change view to 1st person</li>
+            <p><h2>1st person view</h2></p>
+            <li>w — Move forwards</li>
+            <li>s — Move backwards</li>
+            <li>Spacebar — Jump</li>
+            <li>c - Change view to side view</li>
+
         </div>
         <!--
         <div class="col">
@@ -65,12 +79,14 @@
     <audio id="powerup"><source src="./audio/smb_powerup.wav" type="audio/wav"></audio>
     <audio id="stageclear"><source src="./audio/smb_stage_clear.wav" type="audio/wav"></audio>
     <audio id="overworld"><source src="./audio/01-main-theme-overworld.mp3" type="audio/mpeg"></audio>
+    <audio id="overworldhurry"><source src="./audio/18-hurry-overworld.mp3" type="audio/mpeg"></audio>
     <audio id="breakblock"><source src="./audio/smb_breakblock.wav" type="audio/wav"></audio>
     <audio id="bump"><source src="./audio/smb_bump.wav" type="audio/wav"></audio>
     <audio id="coin"><source src="./audio/smb_coin.wav" type="audio/wav"></audio>
     <audio id="flagpole"><source src="./audio/smb_flagpole.wav" type="audio/wav"></audio>
     <audio id="kick"><source src="./audio/smb_kick.wav" type="audio/wav"></audio>
     <audio id="mariodie"><source src="./audio/smb_mariodie.wav" type="audio/wav"></audio>
+    <audio id="gameover"><source src="./audio/smb_gameover.wav" type="audio/wav"></audio>
     <audio id="pause"><source src="./audio/smb_pause.wav" type="audio/wav"></audio>
     <audio id="pipe"><source src="./audio/smb_pipe.wav" type="audio/wav"></audio>
     <audio id="powerupappear"><source src="./audio/smb_powerup_appears.wav" type="audio/wav"></audio>
