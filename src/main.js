@@ -297,9 +297,6 @@ function main() {
     //iterate through object list
     for (let i = 0; i < state.objectCount; i++){
         if (state.objects[i].name.substring(0, 8) === "platform"){  //add all items with platform in their name to the list
-            if(state.objects[i].name.substring(8, 9) === "Q"){
-                mat4.rotateZ(state.objects[i].model.rotation, state.objects[i].model.rotation, (90 * Math.PI/180));
-            }
             platforms.push(state.objects[i]);
         }
     }
@@ -380,6 +377,10 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
         //console.log("time: "+(elapsedTime/1000));
         document.getElementById("timeDisplay").innerHTML = 120 - (elapsedTime/1000).toFixed(0);//starts at 120, counts down
 
+        var bgm = document.getElementById("overworld");
+        bgm.loop=true;
+        bgm.play();
+
         //initialize some objects that aren't passed to function
         let player = getObject(state, "marinario");
         let apple = getObject(state, "apple");
@@ -437,7 +438,7 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
 
     //PRELIMINARY COLLISIONS
             //pit-checker
-            if ((player.model.position[1] < -2)){
+            if ((player.model.position[1] < -1)){
                 bgm.pause();
                 document.getElementById("mariodie").play();
             }
@@ -457,13 +458,10 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                 }
 
             //exit-checker - checks player's position z value vs. exit's position
-
             if (Math.abs(player.model.position[2] - exit.model.position[2]) < 0.5){
                 bgm.pause();
                 document.getElementById("stageclear").play();
             }
-
-
             if (Math.abs(player.model.position[2] - exit.model.position[2]) < 0.15){
                 //patchwork solution to prevent multiple alerts from playing
                 player.model.position[1] += 500;
@@ -548,7 +546,7 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
 
             //if invincible
             if (state.invincible){
-                console.log(player.material.alpha);
+                //console.log(player.material.alpha);
                 if(state.invincible === 1){
                     //revert back to original appearance if invincibility is about to wear off
                     player.material.alpha = 0.5;
@@ -558,7 +556,7 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
             }
 
             //apple nom
-            if(Math.abs(player.model.position[2] - apple.model.position[2]) < 0.5){
+            if(Math.abs(player.model.position[2] - apple.model.position[2]) < 0.2){
                 if(Math.abs((player.model.position[1] + 0.25) - apple.model.position[1]) < 0.2){
                     //get swole
                     document.getElementById("powerup").play();
@@ -634,6 +632,7 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                     //release apple from block
                     if(Math.abs(player.model.position[2] - apple.model.position[2]) < 0.5){
                         if(Math.abs(player.model.position[1] - apple.model.position[1]) < 1){
+                            console.log(platforms[collisionIndex].model.texture);
                             apple.model.position[1] += 0.5;
                         }
                     }
@@ -882,10 +881,12 @@ function enemyPatrol(obj, min, max){
 
     if(obj.model.position[2] >= max){
         vec3.add(obj.model.position, obj.model.position, negativeDirection);
+        mat4.rotateY(obj.model.rotation, obj.model.rotation, (180 * Math.PI/180));
         obj.fromWhichWay = false;
     }
     else if(obj.model.position[2] <= min){
         vec3.add(obj.model.position, obj.model.position, positiveDirection);
+        mat4.rotateY(obj.model.rotation, obj.model.rotation, (180 * Math.PI/180));
         obj.fromWhichWay = true;
     }
     else{
