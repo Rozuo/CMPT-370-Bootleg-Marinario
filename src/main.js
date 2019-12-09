@@ -16,9 +16,9 @@ window.onload = () => {
 }
 
 /**
- * 
- * @param {object - contains vertex, normal, uv information for the mesh to be made} mesh 
- * @param {object - the game object that will use the mesh information} object 
+ *
+ * @param {object - contains vertex, normal, uv information for the mesh to be made} mesh
+ * @param {object - the game object that will use the mesh information} object
  * @purpose - Helper function called as a callback function when the mesh is done loading for the object
  */
 function createMesh(mesh, object) {
@@ -47,10 +47,10 @@ function createMesh(mesh, object) {
 }
 
 /**
- * 
- * @param {string - type of object to be added to the scene} type 
- * @param {string - url of the model being added to the game} url 
- * @purpose **WIP** Adds a new object to the scene from using the gui to add said object 
+ *
+ * @param {string - type of object to be added to the scene} type
+ * @param {string - url of the model being added to the game} url
+ * @purpose **WIP** Adds a new object to the scene from using the gui to add said object
  */
 function addObject(type, url = null) {
     if (type === "Cube") {
@@ -60,7 +60,7 @@ function addObject(type, url = null) {
         testCube.setup();
 
         addObjectToScene(state, testCube);
-        createSceneGui(state);
+        //createSceneGui(state);
     }
 }
 
@@ -91,7 +91,7 @@ function main() {
         uniform mat4 uViewMatrix;
         uniform mat4 uModelMatrix;
         uniform mat4 normalMatrix;
-        
+
         out vec3 oFragPosition;
         out vec3 oCameraPosition;
         out vec3 oNormal;
@@ -122,7 +122,7 @@ function main() {
         in vec3 normalInterp;
         in vec2 oUV;
         in vec3 oVertBitang;
-        
+
         uniform vec3 uCameraPosition;
         uniform int numLights;
         uniform vec3 diffuseVal;
@@ -137,7 +137,7 @@ function main() {
         uniform vec3 uLightPositions[MAX_LIGHTS];
         uniform vec3 uLightColours[MAX_LIGHTS];
         uniform float uLightStrengths[MAX_LIGHTS];
-     
+
         out vec4 fragColor;
 
         void main() {
@@ -188,7 +188,7 @@ function main() {
             } else {
                 fragColor = vec4(ambient + diffuse + specular, 1.0);
             }
-            
+
         }
         `;
 
@@ -312,7 +312,7 @@ function main() {
         if (state.level.objects[i].role === "enemy"){     //add all enemies to the list
             enemies.push(state.level.objects[i]);
         }
-    } 
+    }
 
     //variable for keeping track of time elapsed
     var startTime = new Date();
@@ -320,12 +320,16 @@ function main() {
     //separate variable for exit object
     let exit = getObject(state, "exit");
 
-    
-    //setup mouse click listener                
+
+    //setup mouse click listener
     /*
     canvas.addEventListener('click', (event) => {
         getMousePick(event, state);
     }) */
+
+    var bgm = document.getElementById("overworld");
+    bgm.loop=true;
+    bgm.play();
 
                             //pass collision lists to the render function
     startRendering(gl, state, platforms, enemies, exit, startTime);
@@ -333,9 +337,9 @@ function main() {
 }
 
 /**
- * 
- * @param {object - object containing scene values} state 
- * @param {object - the object to be added to the scene} object 
+ *
+ * @param {object - object containing scene values} state
+ * @param {object - the object to be added to the scene} object
  * @purpose - Helper function for adding a new object to the scene and refreshing the GUI
  */
 function addObjectToScene(state, object) {
@@ -349,13 +353,13 @@ function addObjectToScene(state, object) {
     state.objects.push(object);
     state.objectTable[object.name] = state.objectCount;
     state.objectCount++;
-    createSceneGui(state);
+    //createSceneGui(state);
 }
 
 /**
- * 
- * @param {gl context} gl 
- * @param {object - object containing scene values} state 
+ *
+ * @param {gl context} gl
+ * @param {object - object containing scene values} state
  * @purpose - Calls the drawscene per frame
  */
 function startRendering(gl, state, platforms, enemies, exit, startTime) {
@@ -371,6 +375,11 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
 
         state.deltaTime = deltaTime;
 
+        let currentTime = new Date();
+        let elapsedTime = currentTime.getTime() - startTime.getTime();
+        //console.log("time: "+(elapsedTime/1000));
+        document.getElementById("timeDisplay").innerHTML = 120 - (elapsedTime/1000).toFixed(0);//starts at 120, counts down
+
         //initialize some objects that aren't passed to function
         let player = getObject(state, "marinario");
         let apple = getObject(state, "apple");
@@ -381,10 +390,6 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                 startGame(state);
                 state.gameStarted = true;
             }
-          
-            var bgm = document.getElementById("overworld");
-                bgm.loop=true;
-                bgm.play();
 
             //keeps track of player's position from last frame - for collision direction detection
             state.previous = vec3.fromValues(player.model.position[0], player.model.position[1], player.model.position[2]);
@@ -473,10 +478,13 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                 //# enemies killed, time taken, player y value upon reaching exit
                 if(duration/1000 > 120){
                     state.score = 0;        //too long
+                    document.getElementById("scoreDisplay").innerHTML = state.score;
                 } else {
-                    state.score += ((120 - (duration/1000)) * 100);         //time bonus
-                    state.score += (player.model.position[1]-500) * 300;    //height bonus
+                    state.score += ((120 - (duration/1000).toFixed(0)) * 125);         //time bonus
+                    //state.score += (player.model.position[1]-500) * 300;    //height bonus
+                    document.getElementById("scoreDisplay").innerHTML = state.score;
                 }
+
 
                 //message user, reload game
                 alert("Level clear! Your score was: " + parseInt(state.score));
@@ -505,9 +513,9 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                     }
                 }
             }
-            
-    //EVENTS           
-            //gravity 
+
+    //EVENTS
+            //gravity
             //if no collision and not jumping, fall
             if (!state.collision){
                 if (!state.jump){
@@ -558,7 +566,9 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                     player.model.scale[2] *= 1.2;
                     state.swole = true;
                     //"hide" apple
-                    apple.model.position = vec3.fromValues(0.0, -4.0, -2.0);                                
+                    apple.model.position = vec3.fromValues(0.0, -4.0, -2.0);
+                    state.score += 1000;
+                    document.getElementById("scoreDisplay").innerHTML = state.score;
                 }
             }
 
@@ -572,6 +582,8 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                     //console.log(enemies[i].name);
                     if (state.previous[1] > player.model.position[1] + 0.01){ //if player is colliding from above
                         console.log("squish");
+                        state.score += 100;
+                        document.getElementById("scoreDisplay").innerHTML = state.score;
                         document.getElementById("kick").play();
                         state.bounce = 20;
                         player.model.position[1] += 0.15;
@@ -628,7 +640,7 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                     player.model.position[1] -= 0.15;   //move down slightly to get out of collision
                 }
 
-                    
+
                 //if player was moving right (compare with object)
                 if (state.previous[2] < platforms[collisionIndex].model.position[2]){
                     player.model.position[2] -= 0.15;
@@ -658,7 +670,7 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
                 state.camera.position[2] = player.model.position[2] + 0.2;      //front of player
 
                 //looking in front of player
-                state.camera.center = vec3.fromValues(player.model.position[0] + 0.25, 
+                state.camera.center = vec3.fromValues(player.model.position[0] + 0.25,
                                                     player.model.position[1]+1,
                                                     player.model.position[2]+2);
             }
@@ -704,10 +716,10 @@ function startRendering(gl, state, platforms, enemies, exit, startTime) {
 }
 
 /**
- * 
- * @param {gl context} gl 
- * @param {float - time from now-last} deltaTime 
- * @param {object - contains the state for the scene} state 
+ *
+ * @param {gl context} gl
+ * @param {float - time from now-last} deltaTime
+ * @param {object - contains the state for the scene} state
  * @purpose Iterate through game objects and render the objects aswell as update uniforms
  */
 function drawScene(gl, deltaTime, state) {
@@ -807,7 +819,7 @@ function drawScene(gl, deltaTime, state) {
                         gl.uniform1i(object.programInfo.uniformLocations.samplerExists, state.samplerExists);
                         gl.uniform1i(object.programInfo.uniformLocations.sampler, 0);
                         gl.bindTexture(gl.TEXTURE_2D, object.model.texture);
-                        
+
                     } else {
                         gl.activeTexture(gl.TEXTURE0);
                         state.samplerExists = 0;
@@ -847,9 +859,9 @@ function drawScene(gl, deltaTime, state) {
 
 /**
  *  This function is to calculate and constantly translate the enemies obj in either left or right directions
- * @param {object} obj 
- * @param {float} min 
- * @param {float} max 
+ * @param {object} obj
+ * @param {float} min
+ * @param {float} max
  */
 
 function enemyPatrol(obj, min, max){
@@ -867,7 +879,7 @@ function enemyPatrol(obj, min, max){
     if(obj.enemy != true){
         return;
     }
-    
+
     if(obj.model.position[2] >= max){
         vec3.add(obj.model.position, obj.model.position, negativeDirection);
         obj.fromWhichWay = false;
